@@ -491,17 +491,14 @@ async function submitToNotion(){
   });
 
   try {
-    var res = await fetch('https://script.google.com/macros/s/AKfycbyARdUHDyoYKktWqtY5aHddad1Y2VYIaNLn16jv5UFcrT-aDmTvtwPD9c71AtU0FXpe/exec', {
+    await fetch('https://script.google.com/macros/s/AKfycbyARdUHDyoYKktWqtY5aHddad1Y2VYIaNLn16jv5UFcrT-aDmTvtwPD9c71AtU0FXpe/exec', {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
+      mode: 'no-cors',
+      headers: {'Content-Type': 'text/plain'},
       body: JSON.stringify({properties:properties})
     });
     document.getElementById('submitting').classList.remove('on');
     document.getElementById('done').classList.add('on');
-    if(!res.ok){
-      var err=await res.json();
-      console.error('Notion error:', err);
-    }
   } catch(e){
     console.error(e);
     document.getElementById('submitting').classList.remove('on');
