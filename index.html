@@ -96,7 +96,7 @@ html,body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);min-height:
         </div>
         <div class="p-title">성함을<br>입력해 주세요</div>
         <div class="p-sub">응답 데이터에 함께 저장돼요</div>
-        <div class="ta"><textarea id="name-input" placeholder="예: 홍길동" rows="2" style="min-height:52px;resize:none"></textarea></div>
+        <div class="ta"><input id="name-input" type="text" placeholder="예: 홍길동" style="width:100%;border:none;outline:none;font-size:14px;font-family:inherit;color:var(--t1);background:transparent;padding:0"></div>
         <div class="err" id="e-name">성함을 입력해 주세요</div>
       </div>
 
@@ -460,7 +460,7 @@ document.querySelectorAll('.opts').forEach(opts=>{
 });
 
 document.querySelectorAll('[data-ak]').forEach(inp=>inp.addEventListener('input',function(){ ans[this.dataset.ak]=this.value; }));
-document.getElementById('name-input').addEventListener('input',function(){ ans.respondent_name=this.value; });
+document.getElementById('name-input').addEventListener('input',function(){ ans.respondent_name=this.value.trim(); });
 document.getElementById('q4t').addEventListener('input',function(){ ans.q4_want=this.value; });
 document.getElementById('q5t').addEventListener('input',function(){ ans.q5_want_task=this.value; });
 
@@ -538,7 +538,6 @@ async function submitToNotion(){
       console.error('Notion error:', err);
       document.getElementById('done').classList.add('on');
       document.getElementById('done').querySelector('p').textContent = '저장 중 오류가 발생했어요. 다시 시도해 주세요.';
-    }
     }
   } catch(e){
     console.error(e);
