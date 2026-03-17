@@ -14,9 +14,9 @@ html,body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);min-height:
 .dot{width:7px;height:7px;border-radius:50%;background:var(--bd);transition:all .3s}
 .dot.active{background:var(--accent);width:20px;border-radius:4px}
 .dot.done{background:var(--mid)}
-.card{width:100%;background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,.06)}
-.slider{display:flex;transition:transform .38s cubic-bezier(.4,0,.2,1);will-change:transform}
-.panel{min-width:100%;padding:32px 28px 28px;display:flex;flex-direction:column;flex-shrink:0}
+.card{width:100%;background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,.06);box-sizing:border-box}
+.slider{display:flex;transition:transform .38s cubic-bezier(.4,0,.2,1);will-change:transform;width:100%}
+.panel{min-width:100%;max-width:100%;padding:32px 28px 28px;display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
 .p-step{font-size:11px;font-weight:700;color:var(--accent);letter-spacing:.08em;margin-bottom:14px;display:flex;align-items:center;gap:6px}
 .p-step-dot{width:5px;height:5px;border-radius:50%;background:var(--accent)}
 .p-step.warn{color:var(--warn)}.p-step.warn .p-step-dot{background:var(--warn)}
@@ -52,12 +52,13 @@ html,body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);min-height:
 .ie{display:none;margin-top:6px;padding:10px 12px;background:var(--bg);border-radius:var(--rs);border:1.5px solid var(--bd)}
 .ie.show{display:block}
 .ie input{padding:0;border:none;background:transparent}
-.ta{background:var(--bg);border:1.5px solid var(--bd);border-radius:var(--rs);padding:13px 15px;transition:border-color .2s}
+.ta{background:var(--bg);border:1.5px solid var(--bd);border-radius:var(--rs);padding:13px 15px;transition:border-color .2s;width:100%}
 .ta:focus-within{border-color:var(--accent)}
-.ta textarea{width:100%;border:none;outline:none;font-size:14px;font-family:inherit;color:var(--t1);background:transparent;resize:none;line-height:1.7}
+.ta textarea{width:100%;border:none;outline:none;font-size:14px;font-family:inherit;color:var(--t1);background:transparent;resize:none;line-height:1.7;word-break:keep-all;white-space:pre-wrap}
 .ta textarea::placeholder{color:var(--t3)}
-.hint{background:#EFF5F2;border-radius:var(--rs);padding:11px 13px;margin-top:10px}
-.hint-row{font-size:12px;color:var(--t2);line-height:1.9;display:flex;align-items:baseline;gap:5px}
+.hint{background:#EFF5F2;border-radius:var(--rs);padding:11px 13px;margin-top:10px;width:100%;overflow:hidden}
+.hint-row{font-size:12px;color:var(--t2);line-height:1.7;display:flex;align-items:flex-start;gap:5px;margin-bottom:4px;word-break:keep-all;white-space:normal}
+.hint-row span{flex:1;min-width:0}
 .hdot{width:3px;height:3px;border-radius:50%;background:var(--mid);flex-shrink:0;margin-top:8px}
 .err{font-size:12px;color:var(--warn);margin-top:8px;display:none}.err.show{display:block}
 .card-nav{display:flex;justify-content:space-between;align-items:center;padding:18px 28px 28px;border-top:1px solid var(--bd)}
@@ -84,8 +85,23 @@ html,body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);min-height:
   <div class="card" id="card">
     <div class="slider" id="slider">
 
-      <!-- PANEL 0: Q1 빈도 -->
-      <div class="panel" data-pid="0" data-key="q1_freq" data-type="single" data-auto="true">
+      <!-- PANEL 0: 성함 -->
+      <div class="panel" data-pid="0" data-key="respondent_name" data-type="text">
+        <div class="p-step"><div class="p-step-dot"></div>시작하기 전에</div>
+        <div class="p-icon">
+          <svg viewBox="0 0 26 26" fill="none">
+            <circle cx="13" cy="9" r="4.5" stroke="#4E7C6B" stroke-width="1.6"/>
+            <path d="M5 22c0-4.4 3.6-8 8-8s8 3.6 8 8" stroke="#4E7C6B" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="p-title">성함을<br>입력해 주세요</div>
+        <div class="p-sub">응답 데이터에 함께 저장돼요</div>
+        <div class="ta"><textarea id="name-input" placeholder="예: 홍길동" rows="2" style="min-height:52px;resize:none"></textarea></div>
+        <div class="err" id="e-name">성함을 입력해 주세요</div>
+      </div>
+
+      <!-- PANEL 1: Q1 빈도 -->
+      <div class="panel" data-pid="1" data-key="q1_freq" data-type="single" data-auto="true">
         <div class="p-step"><div class="p-step-dot"></div>Q1</div>
         <div class="p-icon">
           <svg viewBox="0 0 26 26" fill="none">
@@ -109,8 +125,8 @@ html,body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);min-height:
         </div>
       </div>
 
-      <!-- PANEL 1: Q1-1 주요 업무 -->
-      <div class="panel" data-pid="1" data-key="q1_task" data-type="multi" data-cond-key="q1_freq" data-cond-not="거의 안 씀">
+      <!-- PANEL 2: Q1-1 주요 업무 -->
+      <div class="panel" data-pid="2" data-key="q1_task" data-type="multi" data-cond-key="q1_freq" data-cond-not="거의 안 씀">
         <div class="p-step"><div class="p-step-dot"></div>Q1-1 · 추가 질문</div>
         <div class="p-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 4h10l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z" stroke="#4E7C6B" stroke-width="1.7"/><path d="M16 4v5h5M8 11h8M8 14h8M8 17h5" stroke="#4E7C6B" stroke-width="1.5" stroke-linecap="round"/></svg></div>
         <div class="p-title">주로 어떤 업무에<br>활용하고 있나요?</div>
@@ -254,7 +270,7 @@ html,body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);min-height:
           <div class="opt" data-value="화제가 되어 궁금해서"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="#4E7C6B" stroke-width="1.4"/><path d="M10 14v-1M10 7a2 2 0 0 1 1.5 3.3c-.5.5-1.5.9-1.5 1.7" stroke="#4E7C6B" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="opt-body"><strong>화제가 되어 궁금해서</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
           <div class="opt" data-value="내 업무에 딱 맞을 것 같아서"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="2" stroke="#4E7C6B" stroke-width="1.4"/><path d="M7 10l2 2 4-4" stroke="#4E7C6B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="opt-body"><strong>내 업무에 딱 맞을 것 같아서</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
           <div class="opt" data-value="현재 도구보다 더 나을 것 같아서"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><path d="M4 15l4-5 3 3 3-4 4 2" stroke="#4E7C6B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="opt-body"><strong>현재 도구보다 더 나을 것 같아서</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="새 기능을 써보고 싶어서"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="2" stroke="#4E7C6B" stroke-width="1.4"/><path d="M10 7v6M7 10h6" stroke="#4E7C6B" stroke-width="1.5" stroke-linecap="round"/></svg></div><div class="opt-body"><strong>새 기능을 써보고 싶어서</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+
           <div class="opt" data-value="특정 기능이 마음에 들어서" data-inline="ie-liked"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><path d="M4 12V8a6 6 0 0 1 12 0v4" stroke="#4E7C6B" stroke-width="1.4" stroke-linecap="round"/><path d="M3 12h2v3H3zM15 12h2v3h-2z" fill="#4E7C6B" opacity=".4"/></svg></div><div class="opt-body"><strong>특정 기능이 마음에 들어서</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
           <div class="ie" id="ie-liked"><input placeholder="어떤 기능이 마음에 드셨나요?" data-ak="q4_liked_func"></div>
           <div class="opt" data-value="주변에서 좋다고 해서"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><path d="M10 4a3 3 0 1 1 0 6 3 3 0 0 1 0-6zM4 17c0-3 2.7-5 6-5s6 2 6 5" stroke="#4E7C6B" stroke-width="1.4" stroke-linecap="round"/></svg></div><div class="opt-body"><strong>주변에서 좋다고 해서</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
@@ -268,24 +284,16 @@ html,body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);min-height:
         <div class="p-step"><div class="p-step-dot"></div>Q5 <span class="req">필수</span></div>
         <div class="p-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="#4E7C6B" stroke-width="1.7"/><path d="M8 9h8M8 13h8M8 17h5" stroke="#4E7C6B" stroke-width="1.5" stroke-linecap="round"/></svg></div>
         <div class="p-title">AI로 해결하고 싶은<br>업무가 있나요?</div>
-        <div class="p-sub">어떤 업무인지, AI를 쓰고 싶은 이유를 자유롭게 적어주세요</div>
+        <div class="p-sub">어떤 업무인지, AI를 쓰고 싶은 이유를 구체적으로 적어주세요</div>
         <div class="ta"><textarea id="q5t" placeholder="예: 주간보고 초안 자동화, 아이디어 회의 보조..." style="min-height:90px"></textarea></div>
         <div class="hint">
-          <div class="hint-row"><div class="hdot"></div><span>단순 반복 작업 자동화</span></div>
-          <div class="hint-row"><div class="hdot"></div><span>브레인스토밍 보조</span></div>
-          <div class="hint-row"><div class="hdot"></div><span>초안 작성 시간 단축</span></div>
-          <div class="hint-row"><div class="hdot"></div><span>번역·다국어 처리</span></div>
+          <div style="font-size:11px;font-weight:700;color:var(--mid);letter-spacing:.06em;margin-bottom:8px">작성 예시</div>
+          <div class="hint-row"><div class="hdot"></div><span>매일 팀에 업계 뉴스를 공유하는데, 핵심 내용만 자동으로 모아서 정리해주는 봇이 있으면 시간을 많이 아낄 수 있을 것 같아요.</span></div>
+          <div class="hint-row"><div class="hdot"></div><span>기획서 작성 시 레퍼런스를 찾고 시각화하는 작업이 오래 걸려요. AI가 초안을 잡아주면 속도가 훨씬 빨라질 것 같아요.</span></div>
+          <div class="hint-row"><div class="hdot"></div><span>매주 반복되는 주간보고 초안을 AI가 잡아준다면, 내용 검토에만 집중할 수 있을 것 같아요.</span></div>
+          <div class="hint-row"><div class="hdot"></div><span>글로벌 팀과 소통할 때 번역에 시간이 많이 들어요. 맥락에 맞는 번역을 빠르게 해주는 툴이 있으면 좋겠어요.</span></div>
         </div>
         <div class="err" id="e10">내용을 입력해 주세요</div>
-      </div>
-
-      <!-- PANEL 11: Q6 개인 관심 -->
-      <div class="panel" data-pid="11" data-key="q6_personal_ai" data-type="textarea">
-        <div class="p-step"><div class="p-step-dot"></div>Q6</div>
-        <div class="p-icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#4E7C6B" stroke-width="1.7"/><path d="M9 12a3 3 0 0 1 6 0" stroke="#4E7C6B" stroke-width="1.5" stroke-linecap="round"/><circle cx="9" cy="9" r="1.3" fill="#4E7C6B" opacity=".5"/><circle cx="15" cy="9" r="1.3" fill="#4E7C6B" opacity=".5"/><path d="M9 17h6" stroke="#4E7C6B" stroke-width="1.4" stroke-linecap="round"/></svg></div>
-        <div class="p-title">개인적으로<br>써보고 싶은 AI는요?</div>
-        <div class="p-sub">업무 외 관심사도 좋아요. 도구명과 이유를 자유롭게 적어주세요</div>
-        <div class="ta"><textarea id="q6t" placeholder="예: 음악 생성 AI Suno, 작업 BGM을 직접 만들어보고 싶어서..." style="min-height:90px"></textarea></div>
       </div>
 
       <!-- PANEL 12: Q7 망설임 이유 -->
@@ -325,9 +333,9 @@ html,body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);min-height:
 
   <!-- 완료 -->
   <div class="done" id="done">
-    <div class="done-ic"><svg width="30" height="30" viewBox="0 0 34 34" fill="none"><polyline points="5,18 12,25 29,9" stroke="#4E7C6B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <img src="data:image/png;base64,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" alt="감사 이미지" style="width:160px;height:160px;object-fit:cover;border-radius:20px;margin-bottom:20px;">
     <h2>응답 완료!</h2>
-    <p style="margin-top:8px">소중한 의견 감사합니다.<br>커리큘럼 설계와 팀 리포트에 반영할게요.</p>
+    <p style="margin-top:8px">바쁜 시간 내어 응답해 주셔서 감사해요 🙏</p>
   </div>
 </div>
 
@@ -396,6 +404,12 @@ function validate(){
   const p=currentPanel();
   if(!p) return true;
   const key=p.dataset.key, type=p.dataset.type;
+  if(key==='respondent_name'){
+    if(!ans.respondent_name||!ans.respondent_name.trim()){
+      document.getElementById('e-name').classList.add('show'); return false;
+    }
+    return true;
+  }
   if(type==='textarea'){
     if(p.dataset.pid==='10'){
       if(!ans.q5_want_task||!ans.q5_want_task.trim()){
@@ -446,9 +460,9 @@ document.querySelectorAll('.opts').forEach(opts=>{
 });
 
 document.querySelectorAll('[data-ak]').forEach(inp=>inp.addEventListener('input',function(){ ans[this.dataset.ak]=this.value; }));
+document.getElementById('name-input').addEventListener('input',function(){ ans.respondent_name=this.value; });
 document.getElementById('q4t').addEventListener('input',function(){ ans.q4_want=this.value; });
 document.getElementById('q5t').addEventListener('input',function(){ ans.q5_want_task=this.value; });
-document.getElementById('q6t').addEventListener('input',function(){ ans.q6_personal_ai=this.value; });
 
 // ── Notion 제출 ──
 function toSelect(val){ return val ? {select:{name: Array.isArray(val)?val[0]:val}} : undefined; }
@@ -484,6 +498,7 @@ async function submitToNotion(){
 
   const properties = {
     '이름':         { title: [{ text: { content: `응답_${ts}` } }] },
+    '성함':         { rich_text: [{ text: { content: ans.respondent_name||'' } }] },
     'AI 활용 빈도':  toSelect(ans.q1_freq),
     '주요 업무':     { multi_select: q1task.filter(v=>!v.startsWith('기타(')).map(v=>({name:v})) },
     'AI 카테고리':   { multi_select: q1cat.filter(v=>!v.startsWith('기타(')).map(v=>({name:v})) },
