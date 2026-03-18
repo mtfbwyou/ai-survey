@@ -2,512 +2,731 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>팀 AI 활용 현황 조사</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>팀 AI 활용 현황 조사 — 퍼블리싱사업8실</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Barlow+Condensed:wght@800&display=swap" rel="stylesheet">
 <style>
+@import url("https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@800&display=swap");
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#F2F4F0;--card:#fff;--accent:#4E7C6B;--soft:#EAF2EE;--dark:#3A6355;--mid:#6E9E8D;--t1:#1C2120;--t2:#5C6B65;--t3:#A8B5B0;--bd:#DDE5E0;--warn:#C0624A;--warn-soft:#FAEEE9;--r:20px;--rs:11px}
-html,body{font-family:"Noto Sans KR",sans-serif;background:var(--bg);min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:24px 16px 40px}
-.shell{width:100%;max-width:400px;display:flex;flex-direction:column;align-items:center;gap:16px}
-.dots{display:flex;gap:7px;align-items:center}
-.dot{width:7px;height:7px;border-radius:50%;background:var(--bd);transition:all .3s}
-.dot.active{background:var(--accent);width:20px;border-radius:4px}
-.dot.done{background:var(--mid)}
-.card{width:100%;background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,.06);box-sizing:border-box}
-.slider{display:flex;width:100%;transition:transform .38s cubic-bezier(.4,0,.2,1);will-change:transform}
-.panel{min-width:100%;max-width:100%;padding:32px 28px 28px;display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
-.p-step{font-size:11px;font-weight:700;color:var(--accent);letter-spacing:.08em;margin-bottom:14px;display:flex;align-items:center;gap:6px}
-.p-step-dot{width:5px;height:5px;border-radius:50%;background:var(--accent)}
-.p-step.warn{color:var(--warn)}.p-step.warn .p-step-dot{background:var(--warn)}
-.p-icon{width:48px;height:48px;border-radius:13px;background:var(--soft);display:flex;align-items:center;justify-content:center;margin-bottom:16px}
-.p-icon svg{width:24px;height:24px}
-.p-icon.warn-ic{background:var(--warn-soft)}
-.p-title{font-size:22px;font-weight:700;color:var(--t1);line-height:1.35;margin-bottom:6px;letter-spacing:-.3px}
-.p-sub{font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:22px}
+:root{
+  --bg:#EAEDDF;--accent:#8DC63F;--soft:#F0F7E0;--dark:#5A8A20;--mid:#C4D880;
+  --t1:#1a1a1a;--t2:#7a8a60;--t3:#AAB08A;--t4:#C8D4B8;
+  --bd:#E2E4DC;--inner-bd:#DDE0D0;
+  --warn:#C0624A;--warn-soft:#FAEEE9;
+  --r:20px;--rs:12px
+}
+html,body{font-family:"Noto Sans KR",system-ui,sans-serif;background:var(--bg);min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:0}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes guide-in{
+  0%{opacity:0;transform:translateX(-24px)}
+  60%{opacity:1;transform:translateX(4px)}
+  100%{opacity:1;transform:translateX(0)}
+}
+@keyframes guide-glow{
+  0%{box-shadow:0 0 0 0 rgba(141,198,63,0);border-color:var(--accent)}
+  30%{box-shadow:0 0 18px 4px rgba(141,198,63,.35);border-color:#8DC63F}
+  70%{box-shadow:0 0 18px 4px rgba(141,198,63,.35);border-color:#8DC63F}
+  100%{box-shadow:0 0 0 0 rgba(141,198,63,0);border-color:var(--accent)}
+}
+@keyframes row-in{
+  0%{opacity:0;transform:translateX(-10px)}
+  100%{opacity:1;transform:translateX(0)}
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes confetti-fall{0%{transform:translateY(-10px) rotate(0deg);opacity:1}100%{transform:translateY(100px) rotate(420deg);opacity:0}}
+
+/* 레이아웃 */
+.shell{width:100%;display:flex;flex-direction:column;gap:20px;align-items:center;padding:32px 20px}
+.card{width:960px;background:#F4F5F0;border-radius:var(--r);overflow:hidden;border:1px solid var(--bd);display:grid;grid-template-columns:360px 600px;min-height:860px}
+
+/* 왼쪽 비주얼 */
+.vis{background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:28px;border-right:1px solid var(--inner-bd);position:relative;overflow:hidden}
+.vis-org{font-size:11px;color:#B0B8A0;font-weight:400;text-align:center;line-height:1.6;margin-top:4px;letter-spacing:-.2px}
+.vis-eight{margin:auto 0;display:flex;flex-direction:column;align-items:center;gap:12px}
+.vis-tag{font-size:10px;font-weight:700;color:#5A7A20;letter-spacing:.08em;padding:5px 14px;border-radius:20px;background:#D6E8A0;border:1px solid var(--mid)}
+.vis-desc{font-size:13px;font-weight:700;color:var(--t1);text-align:center;line-height:1.6}
+.vis-sub{font-size:11px;color:var(--t2);text-align:center;line-height:1.6}
+
+/* 별점 기준표 */
+.star-guide{background:#fff;border-radius:var(--rs);border:2px solid var(--accent);padding:14px 16px;margin-top:auto;width:100%;animation:guide-in .45s cubic-bezier(.22,1,.36,1) forwards, guide-glow 1.8s ease 0.4s 1}
+.star-guide-title{font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.06em;margin-bottom:10px;display:flex;align-items:center;gap:5px}
+.star-guide-row{display:flex;align-items:center;gap:6px;margin-bottom:7px}
+.star-guide-row:last-child{margin-bottom:0}
+.sg-stars{font-size:11px;flex-shrink:0;width:56px;letter-spacing:1px;color:#F0C040}
+.sg-num{font-size:10px;font-weight:700;color:var(--accent);flex-shrink:0;width:22px}
+.sg-desc{font-size:11px;color:var(--t2);line-height:1.4}
+
+/* 오른쪽 설문 */
+.form{background:#fff;padding:32px 28px;display:flex;flex-direction:column}
+.f-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}
+.f-dots{display:flex;gap:5px;align-items:center}
+.f-dot{width:6px;height:6px;border-radius:50%;background:var(--bd);transition:all .3s}
+.f-dot.active{background:var(--accent);width:18px;border-radius:3px}
+.f-dot.done{background:var(--mid)}
+.f-step-num{font-size:11px;color:var(--t3);font-weight:500}
+.f-step{font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.08em;margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.f-step-dot{width:4px;height:4px;border-radius:50%;background:var(--accent)}
+.f-title{font-size:20px;font-weight:700;color:var(--t1);line-height:1.35;margin-bottom:4px;letter-spacing:-.3px}
+.f-sub{font-size:12px;color:var(--t3);margin-bottom:18px}
+.f-sub-small{font-size:11px;color:var(--t4);margin-bottom:18px;margin-top:-12px}
 .req{font-size:11px;background:var(--warn-soft);color:var(--warn);padding:2px 8px;border-radius:9px;margin-left:6px;font-weight:600;vertical-align:middle}
-.opts{display:flex;flex-direction:column;gap:8px}
-.opt{display:flex;align-items:center;gap:11px;padding:13px 14px;background:var(--bg);border:1.5px solid var(--bd);border-radius:var(--rs);cursor:pointer;transition:all .15s;user-select:none}
-.opt:hover{border-color:var(--mid);background:#F7FAF8}
-.opt:active{transform:scale(.98)}
+
+/* 옵션 */
+.opts{display:flex;flex-direction:column;gap:7px;flex:1}
+.opt{display:flex;align-items:center;gap:10px;padding:11px 13px;border:1.5px solid #E8EAE0;border-radius:var(--rs);cursor:pointer;transition:all .15s;user-select:none;background:#FAFAF7}
+.opt:hover:not(.disabled){border-color:var(--mid);background:#F5F8EE}
 .opt.sel{border-color:var(--accent);background:var(--soft)}
-.opt-ic{width:32px;height:32px;border-radius:8px;background:var(--card);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.opt.sel .opt-ic{background:#fff}
-.opt-ic svg{width:17px;height:17px}
+.opt.disabled{opacity:.35;cursor:not-allowed;pointer-events:none}
+.opt-ic{width:28px;height:28px;border-radius:7px;background:#F0F0E8;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;color:#888}.opt-ic svg{width:16px;height:16px;stroke:currentColor}.opt.sel .opt-ic{background:var(--accent)}.opt.sel .opt-ic svg{color:#fff}
+.opt.sel .opt-ic{background:var(--accent)}
 .opt-body{flex:1}
-.opt-body strong{font-size:14px;font-weight:500;color:var(--t1);display:block;line-height:1.4}
-.opt-body span{font-size:12px;color:var(--t2)}
+.opt-body strong{font-size:13px;font-weight:500;color:#444;display:block;line-height:1.35}
+.opt-body span{font-size:11px;color:#AAA}
 .opt.sel .opt-body strong{color:var(--dark)}
-.radio{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--bd);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.radio{width:15px;height:15px;border-radius:50%;border:1.5px solid #DDD;flex-shrink:0;transition:all .15s}
 .opt.sel .radio{background:var(--accent);border-color:var(--accent)}
-.rdot{width:6px;height:6px;border-radius:50%;background:#fff;display:none}
-.opt.sel .rdot{display:block}
-.cbox{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--bd);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.cbox{width:15px;height:15px;border-radius:4px;border:1.5px solid #DDD;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
 .opt.sel .cbox{background:var(--accent);border-color:var(--accent)}
-.cbox svg{display:none;width:10px;height:10px}
+.cbox svg{display:none;width:9px;height:9px}
 .opt.sel .cbox svg{display:block}
-.oe{margin-top:6px;display:none}.oe.show{display:block}
-.oe input,.ie input{width:100%;padding:10px 12px;border:1.5px solid var(--bd);border-radius:var(--rs);font-size:13px;font-family:inherit;color:var(--t1);background:var(--card);outline:none;transition:border-color .15s}
-.oe input:focus,.ie input:focus{border-color:var(--accent)}
-.ie{display:none;margin-top:6px;padding:10px 12px;background:var(--bg);border-radius:var(--rs);border:1.5px solid var(--bd)}
-.ie.show{display:block}
-.ie input{padding:0;border:none;background:transparent}
-.ta{background:var(--bg);border:1.5px solid var(--bd);border-radius:var(--rs);padding:13px 15px;transition:border-color .2s;width:100%}
+
+/* 기타 인라인 입력 */
+.other-input{display:none;margin-top:6px}
+.other-input.show{display:block}
+.other-input input,.other-input textarea{width:100%;padding:9px 12px;border:1.5px solid var(--bd);border-radius:var(--rs);font-size:13px;font-family:inherit;color:var(--t1);background:#fff;outline:none;transition:border-color .15s;resize:none}
+.other-input input:focus,.other-input textarea:focus{border-color:var(--accent)}
+
+/* 별점 */
+.star-rating{display:flex;gap:6px;margin-top:8px;margin-bottom:2px}
+.star-rating .star{font-size:20px;cursor:pointer;color:#DDD;transition:color .1s;user-select:none}
+.star-rating .star.on{color:#FFD400}
+
+/* 툴 선택 그리드 */
+.tool-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;flex:1}
+.tool-item{display:flex;flex-direction:column;gap:0}
+.tool-opt{display:flex;align-items:center;gap:8px;padding:9px 11px;border:1.5px solid #E8EAE0;border-radius:var(--rs);cursor:pointer;transition:all .15s;background:#FAFAF7;user-select:none}
+.tool-opt:hover{border-color:var(--mid);background:#F5F8EE}
+.tool-opt.sel{border-color:var(--accent);background:var(--soft)}
+.tool-opt strong{font-size:12px;font-weight:500;color:#444;flex:1}
+.tool-opt.sel strong{color:var(--dark)}
+.tool-cbox{width:14px;height:14px;border-radius:3px;border:1.5px solid #DDD;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.tool-opt.sel .tool-cbox{background:var(--accent);border-color:var(--accent)}
+.tool-cbox svg{display:none;width:8px;height:8px}
+.tool-opt.sel .tool-cbox svg{display:block}
+.tool-stars{display:none;padding:6px 11px 8px;background:#F0F7E0;border-radius:0 0 var(--rs) var(--rs);border:1.5px solid var(--accent);border-top:none}
+.tool-stars.show{display:flex;align-items:center;gap:4px}
+.tool-stars .star{font-size:16px;cursor:pointer;color:#DDD;transition:color .1s}
+.tool-stars .star.on{color:#FFD400}
+
+/* textarea */
+.ta{background:#F5F8EE;border:1.5px solid #E8EAE0;border-radius:var(--rs);padding:13px 15px;transition:border-color .2s;margin-bottom:8px}
 .ta:focus-within{border-color:var(--accent)}
-.ta textarea{width:100%;border:none;outline:none;font-size:14px;font-family:inherit;color:var(--t1);background:transparent;resize:none;line-height:1.7;word-break:keep-all;white-space:pre-wrap}
-.ta textarea::placeholder{color:var(--t3)}
-.ta input[type=text]{width:100%;border:none;outline:none;font-size:14px;font-family:inherit;color:var(--t1);background:transparent;padding:4px 0}
-.ta input[type=text]::placeholder{color:var(--t3)}
-.hint{background:#EFF5F2;border-radius:var(--rs);padding:11px 13px;margin-top:10px;width:100%;overflow:hidden}
-.hint-label{font-size:11px;font-weight:700;color:var(--mid);letter-spacing:.06em;margin-bottom:8px}
-.hint-row{font-size:12px;color:var(--t2);line-height:1.7;display:flex;align-items:flex-start;gap:5px;margin-bottom:4px;word-break:keep-all;white-space:normal}
+.ta textarea{width:100%;border:none;outline:none;font-size:14px;font-family:inherit;color:var(--t1);background:transparent;resize:none;line-height:1.7;min-height:80px}
+.ta textarea::placeholder{color:#BCC4AA}
+
+/* 힌트 박스 */
+.hint{background:#EEF3E8;border-radius:var(--rs);padding:12px 14px;width:100%}
+.hint-label{font-size:10px;font-weight:700;color:var(--dark);letter-spacing:.06em;margin-bottom:8px}
+.hint-row{font-size:11px;color:var(--t2);line-height:1.7;display:flex;align-items:flex-start;gap:5px;margin-bottom:3px;word-break:keep-all}
 .hint-row span{flex:1;min-width:0}
-.hdot{width:3px;height:3px;border-radius:50%;background:var(--mid);flex-shrink:0;margin-top:8px}
-.err{font-size:12px;color:var(--warn);margin-top:8px;display:none}.err.show{display:block}
-.card-nav{display:flex;justify-content:space-between;align-items:center;padding:18px 28px 28px;border-top:1px solid var(--bd)}
-.btn-back-card{background:none;border:1.5px solid var(--bd);padding:10px 18px;border-radius:var(--rs);font-size:13px;color:var(--t2);cursor:pointer;font-family:inherit;transition:all .15s}
-.btn-back-card:hover{border-color:var(--mid)}
-.btn-next-card{background:var(--accent);border:none;padding:11px 28px;border-radius:var(--rs);font-size:14px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit;transition:background .15s;letter-spacing:-.2px}
-.btn-next-card:hover{background:var(--dark)}
-.nav-step{font-size:12px;color:var(--t3)}
-.done{display:none;width:100%;background:var(--card);border-radius:var(--r);padding:48px 28px 40px;text-align:center;box-shadow:0 2px 16px rgba(0,0,0,.06)}
+.hdot{width:3px;height:3px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:7px}
+
+/* 이름 입력 */
+.name-ta{background:#F5F8EE;border:1.5px solid #E8EAE0;border-radius:var(--rs);padding:13px 15px;transition:border-color .2s}
+.name-ta:focus-within{border-color:var(--accent)}
+.name-ta input{width:100%;border:none;outline:none;font-size:15px;font-family:inherit;color:var(--t1);background:transparent}
+.name-ta input::placeholder{color:#BCC4AA}
+
+.err{font-size:12px;color:var(--warn);margin-top:6px;display:none}
+.err.show{display:block}
+
+/* 하단 네비 */
+.f-nav{display:flex;justify-content:space-between;align-items:center;margin-top:20px;padding-top:16px;border-top:1px solid #F0F0E8}
+.btn-back{font-size:12px;color:#BBB;padding:8px 16px;border:1.5px solid #E8EAE0;border-radius:var(--rs);cursor:pointer;font-family:inherit;background:#fff;transition:all .15s}
+.btn-back:hover{border-color:var(--mid)}
+.f-step-txt{font-size:11px;color:#CCC}
+.btn-next{font-size:13px;font-weight:700;color:#fff;padding:9px 24px;background:var(--accent);border:none;border-radius:var(--rs);cursor:pointer;font-family:inherit;transition:background .15s}
+.btn-next:hover{background:var(--dark)}
+
+/* 완료/제출 */
+.done{display:none;width:960px;background:#fff;border-radius:var(--r);padding:60px 40px;text-align:center;border:1px solid var(--bd);position:relative;overflow:hidden}
 .done.on{display:block}
-.done h2{font-size:22px;font-weight:700;color:var(--t1);margin-bottom:8px;letter-spacing:-.3px}
-.done p{font-size:13px;color:var(--t2);line-height:1.7}
-.submitting{display:none;width:100%;background:var(--card);border-radius:var(--r);padding:48px 28px 40px;text-align:center;box-shadow:0 2px 16px rgba(0,0,0,.06)}
+.done h2{font-size:24px;font-weight:700;color:var(--t1);margin-bottom:10px;letter-spacing:-.3px}
+.done p{font-size:14px;color:var(--t2);line-height:1.7}
+.submitting{display:none;width:960px;background:#fff;border-radius:var(--r);padding:60px 40px;text-align:center;border:1px solid var(--bd)}
 .submitting.on{display:block}
 .spinner{width:36px;height:36px;border:3px solid var(--soft);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px}
-@keyframes spin{to{transform:rotate(360deg)}}
+
+@media(max-width:700px){
+  .card{grid-template-columns:1fr;min-height:auto}
+  .vis{padding:24px;border-right:none;border-bottom:1px solid var(--inner-bd)}
+  .vis-eight{margin:16px 0}
+}
 </style>
 </head>
 <body>
 <div class="shell">
-  <div class="dots" id="dots"></div>
   <div class="card" id="card">
-    <div class="slider" id="slider">
 
-      <!-- PANEL 0: 성함 -->
-      <div class="panel" data-pid="0" data-key="respondent_name" data-type="name">
-        <div class="p-step"><div class="p-step-dot"></div>시작하기 전에</div>
-        <div class="p-icon"><svg viewBox="0 0 26 26" fill="none"><circle cx="13" cy="9" r="4.5" stroke="#4E7C6B" stroke-width="1.6"/><path d="M5 22c0-4.4 3.6-8 8-8s8 3.6 8 8" stroke="#4E7C6B" stroke-width="1.6" stroke-linecap="round"/></svg></div>
-        <div class="p-title">성함을<br>입력해 주세요</div>
-        <div class="p-sub">응답 데이터에 함께 저장돼요</div>
-        <div class="ta"><input type="text" id="name-input" placeholder="예: 홍길동"></div>
-        <div class="err" id="e-name">성함을 입력해 주세요</div>
+    <!-- 왼쪽 비주얼 -->
+    <div class="vis">
+      <div class="vis-org">퍼블리싱라이브본부<br>퍼블리싱사업8실</div>
+      <div class="vis-eight" id="vis-eight">
+        <svg style="animation:float 4s ease-in-out infinite" width="200" height="200" viewBox="0 0 150 150">
+          <text x="75" y="105" text-anchor="middle" font-family="'Barlow Condensed',system-ui,sans-serif" font-size="130" font-weight="800" font-style="normal" fill="none" stroke="#D6E8A0" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="320 800" dominant-baseline="middle">
+            <animate attributeName="stroke-dashoffset" from="0" to="-1120" dur="8s" repeatCount="indefinite"/>8
+          </text>
+          <text x="75" y="105" text-anchor="middle" font-family="'Barlow Condensed',system-ui,sans-serif" font-size="130" font-weight="800" font-style="normal" fill="none" stroke="#C8E09A" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="180 940" dominant-baseline="middle" opacity=".7">
+            <animate attributeName="stroke-dashoffset" from="-560" to="-1680" dur="8s" repeatCount="indefinite"/>8
+          </text>
+          <text x="75" y="105" text-anchor="middle" font-family="'Barlow Condensed',system-ui,sans-serif" font-size="130" font-weight="800" font-style="normal" fill="none" stroke="#E4F0C0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="100 1020" dominant-baseline="middle">
+            <animate attributeName="stroke-dashoffset" from="-280" to="-1400" dur="8s" repeatCount="indefinite"/>8
+          </text>
+        </svg>
+        <div class="vis-tag" id="vis-tag">퍼블리싱사업8실</div>
+        <div class="vis-desc" id="vis-desc">팀 AI 활용 현황 조사</div>
+        <div class="vis-sub" id="vis-sub">솔직하게 답해주세요 :)</div>
       </div>
 
-      <!-- PANEL 1: Q1 빈도 -->
-      <div class="panel" data-pid="1" data-key="q1_freq" data-type="single" data-auto="true">
-        <div class="p-step"><div class="p-step-dot"></div>Q1</div>
-        <div class="p-icon"><svg viewBox="0 0 26 26" fill="none"><rect x="5" y="9" width="16" height="12" rx="3" stroke="#4E7C6B" stroke-width="1.6"/><rect x="8.5" y="12" width="3" height="3" rx="1" fill="#4E7C6B" opacity=".7"/><rect x="14.5" y="12" width="3" height="3" rx="1" fill="#4E7C6B" opacity=".7"/><path d="M10 17h6" stroke="#4E7C6B" stroke-width="1.5" stroke-linecap="round"/><path d="M13 9V6" stroke="#4E7C6B" stroke-width="1.5" stroke-linecap="round"/><circle cx="13" cy="5" r="1.5" fill="#4E7C6B"/><rect x="2" y="12" width="3" height="4" rx="1" fill="#4E7C6B" opacity=".3"/><rect x="21" y="12" width="3" height="4" rx="1" fill="#4E7C6B" opacity=".3"/></svg></div>
-        <div class="p-title">AI 도구를 얼마나<br>자주 활용하시나요?</div>
-        <div class="p-sub">하나를 고르면 자동으로 넘어가요</div>
-        <div class="opts">
-          <div class="opt" data-value="거의 매일"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7.5" stroke="#4E7C6B" stroke-width="1.6"/><path d="M10 6v4l2.5 2.5" stroke="#4E7C6B" stroke-width="1.6" stroke-linecap="round"/></svg></div><div class="opt-body"><strong>거의 매일</strong><span>업무 흐름에 AI가 있어요</span></div><div class="radio"><div class="rdot"></div></div></div>
-          <div class="opt" data-value="주 1~3회"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="4" width="14" height="13" rx="2" stroke="#4E7C6B" stroke-width="1.5"/><path d="M3 8h14M7 2v4M13 2v4" stroke="#4E7C6B" stroke-width="1.5" stroke-linecap="round"/></svg></div><div class="opt-body"><strong>주 1~3회</strong><span>정기적으로 활용해요</span></div><div class="radio"><div class="rdot"></div></div></div>
-          <div class="opt" data-value="월 1~3회"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="#4E7C6B" stroke-width="1.5"/><path d="M10 6v4l2 2" stroke="#4E7C6B" stroke-width="1.5" stroke-linecap="round"/></svg></div><div class="opt-body"><strong>월 1~3회</strong><span>필요할 때 가끔 써요</span></div><div class="radio"><div class="rdot"></div></div></div>
-          <div class="opt" data-value="거의 안 씀"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7.5" stroke="#4E7C6B" stroke-width="1.6"/><path d="M7 10h6" stroke="#4E7C6B" stroke-width="1.8" stroke-linecap="round"/></svg></div><div class="opt-body"><strong>거의 안 씀</strong><span>아직 AI가 익숙하지 않아요</span></div><div class="radio"><div class="rdot"></div></div></div>
-        </div>
+      <!-- 별점 기준표 (Q4에서만 표시) -->
+      <div class="star-guide" id="star-guide" style="display:none">
+        <div class="star-guide-title"><svg width="13" height="13" viewBox="0 0 20 20" fill="none"><path d="M10 2l2.4 4.9 5.4.8-3.9 3.8.9 5.3L10 14.3l-4.8 2.5.9-5.3L2.2 7.7l5.4-.8z" fill="#8DC63F" stroke="#8DC63F" stroke-width="1" stroke-linejoin="round"/></svg> 활용도 별점 기준 <span style="font-size:9px;color:var(--accent);background:var(--soft);padding:1px 6px;border-radius:9px;margin-left:2px">Q4 가이드</span></div>
+        <div class="star-guide-row" style="animation:row-in .4s ease .5s both"><span class="sg-stars">★☆☆☆☆</span><span class="sg-num">1점</span><span class="sg-desc">거의 못 씀</span></div>
+        <div class="star-guide-row" style="animation:row-in .4s ease .62s both"><span class="sg-stars">★★☆☆☆</span><span class="sg-num">2점</span><span class="sg-desc">가끔 써봤지만 익숙하지 않음</span></div>
+        <div class="star-guide-row" style="animation:row-in .4s ease .74s both"><span class="sg-stars">★★★☆☆</span><span class="sg-num">3점</span><span class="sg-desc">기본 기능은 활용 가능</span></div>
+        <div class="star-guide-row" style="animation:row-in .4s ease .86s both"><span class="sg-stars">★★★★☆</span><span class="sg-num">4점</span><span class="sg-desc">자주 쓰고 꽤 잘 활용함</span></div>
+        <div class="star-guide-row" style="animation:row-in .4s ease .98s both"><span class="sg-stars">★★★★★</span><span class="sg-num">5점</span><span class="sg-desc">거의 모든 기능 파악·적극 활용</span></div>
       </div>
-
-      <!-- PANEL 2: Q1-1 주요 업무 -->
-      <div class="panel" data-pid="2" data-key="q1_task" data-type="multi" data-cond-key="q1_freq" data-cond-not="거의 안 씀">
-        <div class="p-step"><div class="p-step-dot"></div>Q1-1 · 추가 질문</div>
-        <div class="p-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 4h10l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z" stroke="#4E7C6B" stroke-width="1.7"/><path d="M16 4v5h5M8 11h8M8 14h8M8 17h5" stroke="#4E7C6B" stroke-width="1.5" stroke-linecap="round"/></svg></div>
-        <div class="p-title">주로 어떤 업무에<br>활용하고 있나요?</div>
-        <div class="p-sub">해당하는 항목을 모두 골라주세요</div>
-        <div class="opts">
-          <div class="opt" data-value="문서·보고서 작성"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><path d="M5 3h8l4 4v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" stroke="#4E7C6B" stroke-width="1.5"/><path d="M13 3v4h4M7 9h6M7 12h6M7 15h4" stroke="#4E7C6B" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="opt-body"><strong>문서·보고서 작성</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="발표자료 기획·초안"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><rect x="2" y="4" width="16" height="12" rx="2" stroke="#4E7C6B" stroke-width="1.5"/><path d="M7 10h2v3H7zM11 7h2v6h-2z" fill="#4E7C6B" opacity=".4"/></svg></div><div class="opt-body"><strong>발표자료 기획·초안</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="데이터 분석·정리"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><path d="M3 15l4-4 3 3 4-5 4 2" stroke="#4E7C6B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="opt-body"><strong>데이터 분석·정리</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="번역·현지화"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><path d="M3 5h8M7 3v2M3 5c0 3 2 5 4 6M9 11c-1.5-.5-3-2-3-3" stroke="#4E7C6B" stroke-width="1.4" stroke-linecap="round"/><path d="M12 10l2-5 2 5M13 13h2" stroke="#4E7C6B" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="opt-body"><strong>번역·현지화</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="회의록·자료 요약"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><path d="M5 5h10M5 8h10M5 11h7" stroke="#4E7C6B" stroke-width="1.5" stroke-linecap="round"/></svg></div><div class="opt-body"><strong>회의록·자료 요약</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="아이디어 발굴·기획"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><path d="M10 3a5 5 0 0 1 2 9.5V14H8v-1.5A5 5 0 0 1 10 3z" stroke="#4E7C6B" stroke-width="1.5"/><path d="M8 16h4M9 18h2" stroke="#4E7C6B" stroke-width="1.4" stroke-linecap="round"/></svg></div><div class="opt-body"><strong>아이디어 발굴·기획</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="정보 검색·리서치"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="5.5" stroke="#4E7C6B" stroke-width="1.5"/><path d="M13 13l3.5 3.5" stroke="#4E7C6B" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="opt-body"><strong>정보 검색·리서치</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="기타(업무)" data-is-other="true"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><circle cx="5" cy="10" r="1.5" fill="#4E7C6B"/><circle cx="10" cy="10" r="1.5" fill="#4E7C6B"/><circle cx="15" cy="10" r="1.5" fill="#4E7C6B"/></svg></div><div class="opt-body"><strong>기타</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="oe" id="oe-q1_task"><input placeholder="직접 입력해 주세요" data-ak="q1_task_other"></div>
-        </div>
-      </div>
-
-      <!-- PANEL 3: Q1-2 카테고리 -->
-      <div class="panel" data-pid="3" data-key="q1_category" data-type="multi" data-cond-key="q1_freq" data-cond-not="거의 안 씀">
-        <div class="p-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 14V8a7 7 0 1 1 14 0v6" stroke="#4E7C6B" stroke-width="1.7" stroke-linecap="round"/><path d="M3 14h3v4H3zM18 14h3v4h-3z" fill="#4E7C6B" opacity=".4"/></svg></div>
-        <div class="p-step"><div class="p-step-dot"></div>Q1-2 · 추가 질문</div>
-        <div class="p-title">어떤 카테고리의<br>AI를 활용하나요?</div>
-        <div class="p-sub">해당하는 항목을 모두 골라주세요</div>
-        <div class="opts">
-          <div class="opt" data-value="LLM 챗봇"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><path d="M4 14V8a6 6 0 1 1 12 0v6" stroke="#4E7C6B" stroke-width="1.5" stroke-linecap="round"/><path d="M3 14h2v3H3zM15 14h2v3h-2z" fill="#4E7C6B" opacity=".4"/></svg></div><div class="opt-body"><strong>LLM 챗봇</strong><span>ChatGPT, Claude, Gemini 등</span></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="이미지 생성 AI"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><rect x="2" y="4" width="16" height="12" rx="2" stroke="#4E7C6B" stroke-width="1.5"/><circle cx="7" cy="8.5" r="1.5" fill="#4E7C6B" opacity=".4"/><path d="M2 14l4-4 3 3 2-2 5 4" stroke="#4E7C6B" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="opt-body"><strong>이미지 생성 AI</strong><span>Midjourney, DALL·E 등</span></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="영상·음성 AI"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><rect x="2" y="5" width="12" height="10" rx="2" stroke="#4E7C6B" stroke-width="1.5"/><path d="M14 8.5l4-2.5v7l-4-2.5V8.5z" stroke="#4E7C6B" stroke-width="1.4" stroke-linejoin="round"/></svg></div><div class="opt-body"><strong>영상·음성 AI</strong><span>Sora, ElevenLabs 등</span></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="AI 검색 엔진"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="5.5" stroke="#4E7C6B" stroke-width="1.5"/><path d="M13 13l3.5 3.5M9 7v4M7 9h4" stroke="#4E7C6B" stroke-width="1.4" stroke-linecap="round"/></svg></div><div class="opt-body"><strong>AI 검색 엔진</strong><span>Perplexity, Grok 등</span></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="오피스 내장 AI"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="2" stroke="#4E7C6B" stroke-width="1.5"/><path d="M7 10h6M7 7h3M7 13h4" stroke="#4E7C6B" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="opt-body"><strong>오피스 내장 AI</strong><span>Copilot, Workspace AI 등</span></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="자동화 도구 내 AI"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><path d="M5 10a5 5 0 0 1 10 0M15 10a5 5 0 0 1-10 0" stroke="#4E7C6B" stroke-width="1.4" stroke-linecap="round" stroke-dasharray="3 2"/><circle cx="10" cy="10" r="2" fill="#4E7C6B" opacity=".5"/></svg></div><div class="opt-body"><strong>자동화 도구 내 AI</strong><span>Make, Zapier, Notion AI 등</span></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="기타(카테고리)" data-is-other="true"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><circle cx="5" cy="10" r="1.5" fill="#4E7C6B"/><circle cx="10" cy="10" r="1.5" fill="#4E7C6B"/><circle cx="15" cy="10" r="1.5" fill="#4E7C6B"/></svg></div><div class="opt-body"><strong>기타</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="oe" id="oe-q1_category"><input placeholder="직접 입력해 주세요" data-ak="q1_cat_other"></div>
-        </div>
-      </div>
-
-      <!-- PANEL 4: Q2 선택 이유 -->
-      <div class="panel" data-pid="4" data-key="q2_reason" data-type="multi">
-        <div class="p-step"><div class="p-step-dot"></div>Q2</div>
-        <div class="p-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h11M4 17h7" stroke="#4E7C6B" stroke-width="1.7" stroke-linecap="round"/><circle cx="20" cy="17" r="4" fill="#EAF2EE" stroke="#4E7C6B" stroke-width="1.5"/><path d="M18.5 17l1 1 2-2" stroke="#4E7C6B" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="p-title">이 AI를 선택한<br>이유가 뭔가요?</div>
-        <div class="p-sub">해당하는 이유를 모두 골라주세요</div>
-        <div class="opts">
-          <div class="opt" data-value="회사 제공 서비스라서"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="8" width="14" height="10" rx="1.5" stroke="#4E7C6B" stroke-width="1.4"/><path d="M7 8V6a3 3 0 0 1 6 0v2" stroke="#4E7C6B" stroke-width="1.4"/></svg></div><div class="opt-body"><strong>회사 제공 서비스라서</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="주변 추천을 받아서"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><path d="M10 4a3 3 0 1 1 0 6 3 3 0 0 1 0-6zM4 17c0-3 2.7-5 6-5s6 2 6 5" stroke="#4E7C6B" stroke-width="1.4" stroke-linecap="round"/></svg></div><div class="opt-body"><strong>주변 추천을 받아서</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="써보니 가장 유용해서"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><path d="M10 3l2 4 4.5.7-3.2 3.1.75 4.4L10 13l-4.05 2.2.75-4.4L3.5 7.7 8 7z" stroke="#4E7C6B" stroke-width="1.4" stroke-linejoin="round"/></svg></div><div class="opt-body"><strong>써보니 가장 유용해서</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="무료로 사용 가능해서"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="#4E7C6B" stroke-width="1.4"/><path d="M10 7v1.5M10 11.5V13M7.5 9.5a2.5 1.5 0 1 0 5 0 2.5 1.5 0 0 0-5 0z" stroke="#4E7C6B" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="opt-body"><strong>무료로 사용 가능해서</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="업데이트 후 써보니 좋아서"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><path d="M4 10a6 6 0 0 1 11.5-2M16 10a6 6 0 0 1-11.5 2" stroke="#4E7C6B" stroke-width="1.4" stroke-linecap="round"/><path d="M15.5 5.5V8H13" stroke="#4E7C6B" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="opt-body"><strong>업데이트 후 써보니 좋아서</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="예전부터 써서 익숙해서"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><path d="M10 3C6.5 3 4 5.5 4 9c0 4 6 9 6 9s6-5 6-9c0-3.5-2.5-6-6-6z" stroke="#4E7C6B" stroke-width="1.4"/><circle cx="10" cy="9" r="2" fill="#4E7C6B" opacity=".4"/></svg></div><div class="opt-body"><strong>예전부터 써서 익숙해서</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="기타(선택이유)" data-is-other="true"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><circle cx="5" cy="10" r="1.5" fill="#4E7C6B"/><circle cx="10" cy="10" r="1.5" fill="#4E7C6B"/><circle cx="15" cy="10" r="1.5" fill="#4E7C6B"/></svg></div><div class="opt-body"><strong>기타</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="oe" id="oe-q2_reason"><input placeholder="직접 입력해 주세요" data-ak="q2_reason_other"></div>
-        </div>
-        <div class="err" id="e4">이유를 하나 이상 선택해 주세요</div>
-      </div>
-
-      <!-- PANEL 5: Q2-1 전환 계기 -->
-      <div class="panel" data-pid="5" data-key="q2_switch" data-type="multi">
-        <div class="p-step"><div class="p-step-dot"></div>Q2-1 · 추가 질문</div>
-        <div class="p-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#4E7C6B" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="p-title">전에 쓰던 AI에서<br>바꾼 계기가 있나요?</div>
-        <div class="p-sub">해당하는 항목을 모두 골라주세요</div>
-        <div class="opts">
-          <div class="opt" data-value="처음부터 이 도구만 사용"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="#4E7C6B" stroke-width="1.4"/><path d="M7 10l2 2 4-4" stroke="#4E7C6B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="opt-body"><strong>처음부터 이 도구만 사용</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="성능·품질이 더 좋아서"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><path d="M4 15l4-5 3 3 3-4 4 2" stroke="#4E7C6B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="opt-body"><strong>성능·품질이 더 좋아서</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="가격이 더 합리적이어서"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="#4E7C6B" stroke-width="1.4"/><path d="M10 7v1M10 12v1M7.5 10a2.5 1.5 0 1 0 5 0 2.5 1.5 0 0 0-5 0z" stroke="#4E7C6B" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="opt-body"><strong>가격이 더 합리적이어서</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="필요한 기능이 새로 생겨서"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="2" stroke="#4E7C6B" stroke-width="1.4"/><path d="M10 7v6M7 10h6" stroke="#4E7C6B" stroke-width="1.5" stroke-linecap="round"/></svg></div><div class="opt-body"><strong>필요한 기능이 새로 생겨서</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="화제여서 써봤는데 계속 씀"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><path d="M10 4l1.8 3.6L16 8.4l-3 2.9.7 4.1L10 13.5l-3.7 1.9.7-4.1L4 8.4l4.2-.8z" stroke="#4E7C6B" stroke-width="1.3" stroke-linejoin="round"/></svg></div><div class="opt-body"><strong>화제여서 써봤는데 계속 씀</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="이전 AI 서비스가 불만이어서"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="#4E7C6B" stroke-width="1.4"/><path d="M7 13c.8-1.5 4.2-1.5 6 0M7.5 8h.5M12 8h.5" stroke="#4E7C6B" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="opt-body"><strong>이전 AI 서비스가 불만이어서</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="회사에서 새로 추가해준 서비스여서"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="8" width="14" height="10" rx="1.5" stroke="#4E7C6B" stroke-width="1.4"/><path d="M7 8V6a3 3 0 0 1 6 0v2" stroke="#4E7C6B" stroke-width="1.4"/><path d="M10 12v2M9 13h2" stroke="#4E7C6B" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="opt-body"><strong>회사에서 새로 추가해준 서비스여서</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="기타(전환계기)" data-is-other="true"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><circle cx="5" cy="10" r="1.5" fill="#4E7C6B"/><circle cx="10" cy="10" r="1.5" fill="#4E7C6B"/><circle cx="15" cy="10" r="1.5" fill="#4E7C6B"/></svg></div><div class="opt-body"><strong>기타</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="oe" id="oe-q2_switch"><input placeholder="직접 입력해 주세요" data-ak="q2_switch_other"></div>
-        </div>
-      </div>
-
-      <!-- PANEL 6: Q2-1-1 이전 AI 불만 -->
-      <div class="panel" data-pid="6" data-key="q2_dissatisfied" data-type="multi" data-cond-key="q2_switch" data-cond-includes="이전 AI 서비스가 불만이어서">
-        <div class="p-step warn"><div class="p-step-dot"></div>Q2-1-1 · 추가 질문</div>
-        <div class="p-icon warn-ic"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#C0624A" stroke-width="1.7"/><path d="M12 7v6" stroke="#C0624A" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="17" r="1.3" fill="#C0624A"/></svg></div>
-        <div class="p-title">이전 AI, 어떤 점이<br>불만이었나요?</div>
-        <div class="p-sub">해당하는 항목을 모두 골라주세요</div>
-        <div class="opts">
-          <div class="opt" data-value="결과물 품질이 낮음"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><path d="M4 15l4-5 3 3 3-4 4 2" stroke="#4E7C6B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="opt-body"><strong>결과물 품질이 낮음</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="사용량 제한이 너무 빡빡함"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><rect x="4" y="4" width="12" height="12" rx="2" stroke="#4E7C6B" stroke-width="1.4"/><path d="M8 10h4" stroke="#C0624A" stroke-width="1.6" stroke-linecap="round"/></svg></div><div class="opt-body"><strong>사용량 제한이 너무 빡빡함</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="가격 대비 가치가 낮음"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="#4E7C6B" stroke-width="1.4"/><path d="M10 6v8M7 8.5h4.5a1.5 1.5 0 0 1 0 3H7" stroke="#C0624A" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="opt-body"><strong>가격 대비 가치가 낮음</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="UI·UX가 불편함"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="4" width="14" height="12" rx="2" stroke="#4E7C6B" stroke-width="1.4"/><path d="M8 10h4M10 8v4" stroke="#C0624A" stroke-width="1.4" stroke-linecap="round"/></svg></div><div class="opt-body"><strong>UI·UX가 불편함</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="원하는 기능이 없음"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="2" stroke="#4E7C6B" stroke-width="1.4"/><path d="M8 10h4" stroke="#C0624A" stroke-width="1.5" stroke-linecap="round"/></svg></div><div class="opt-body"><strong>원하는 기능이 없음</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="오류·할루시네이션이 잦음"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="#4E7C6B" stroke-width="1.4"/><path d="M10 7v4" stroke="#C0624A" stroke-width="1.5" stroke-linecap="round"/><circle cx="10" cy="13.5" r="1" fill="#C0624A"/></svg></div><div class="opt-body"><strong>오류·할루시네이션이 잦음</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="기타(불만)" data-is-other="true"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><circle cx="5" cy="10" r="1.5" fill="#4E7C6B"/><circle cx="10" cy="10" r="1.5" fill="#4E7C6B"/><circle cx="15" cy="10" r="1.5" fill="#4E7C6B"/></svg></div><div class="opt-body"><strong>기타</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="oe" id="oe-q2_dis"><input placeholder="직접 입력해 주세요" data-ak="q2_dis_other"></div>
-        </div>
-      </div>
-
-      <!-- PANEL 7: Q3 유료 -->
-      <div class="panel" data-pid="7" data-key="q3_paid" data-type="single" data-auto="true">
-        <div class="p-step"><div class="p-step-dot"></div>Q3</div>
-        <div class="p-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="18" height="13" rx="3" stroke="#4E7C6B" stroke-width="1.7"/><path d="M3 11h18" stroke="#4E7C6B" stroke-width="1.6"/><rect x="6" y="14" width="6" height="2.5" rx="1" fill="#4E7C6B" opacity=".4"/></svg></div>
-        <div class="p-title">개인 비용을 내고<br>쓰는 AI가 있나요?</div>
-        <div class="p-sub">하나를 고르면 자동으로 넘어가요</div>
-        <div class="opts">
-          <div class="opt" data-value="있음"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="#4E7C6B" stroke-width="1.4"/><path d="M7 10l2 2 4-4" stroke="#4E7C6B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="opt-body"><strong>있음</strong><span>개인 카드로 구독 중이에요</span></div><div class="radio"><div class="rdot"></div></div></div>
-          <div class="opt" data-value="없음(무료만)"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="#4E7C6B" stroke-width="1.4"/><path d="M8 10h4" stroke="#4E7C6B" stroke-width="1.6" stroke-linecap="round"/></svg></div><div class="opt-body"><strong>없음</strong><span>무료 플랜만 사용해요</span></div><div class="radio"><div class="rdot"></div></div></div>
-          <div class="opt" data-value="없음(회사제공)"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="8" width="14" height="10" rx="1.5" stroke="#4E7C6B" stroke-width="1.4"/><path d="M7 8V6a3 3 0 0 1 6 0v2" stroke="#4E7C6B" stroke-width="1.4"/></svg></div><div class="opt-body"><strong>없음</strong><span>회사가 제공해주는 서비스만 업무적으로 사용</span></div><div class="radio"><div class="rdot"></div></div></div>
-        </div>
-      </div>
-
-      <!-- PANEL 8: Q3-1 유료 이유 -->
-      <div class="panel" data-pid="8" data-key="q3_why_pay" data-type="multi" data-cond-key="q3_paid" data-cond-val="있음">
-        <div class="p-step"><div class="p-step-dot"></div>Q3-1 · 추가 질문</div>
-        <div class="p-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3l2.5 5 5.5.8-4 3.9.9 5.5L12 15.5l-4.9 2.7.9-5.5L4 8.8l5.5-.8z" stroke="#4E7C6B" stroke-width="1.7" stroke-linejoin="round"/></svg></div>
-        <div class="p-title">개인 비용까지 내면서<br>쓰는 이유가 뭔가요?</div>
-        <div class="p-sub">해당하는 항목을 모두 골라주세요</div>
-        <div class="opts">
-          <div class="opt" data-value="유료 결과물이 확연히 달라서"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><path d="M4 15l4-5 3 3 3-4 4 2" stroke="#4E7C6B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="opt-body"><strong>유료 결과물이 확연히 달라서</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="무료 사용량이 부족해서"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><path d="M4 10a6 6 0 0 1 12 0" stroke="#4E7C6B" stroke-width="1.4" stroke-linecap="round"/><path d="M10 16v-2M7 15l1-1.7M13 15l-1-1.7" stroke="#4E7C6B" stroke-width="1.4" stroke-linecap="round"/></svg></div><div class="opt-body"><strong>무료 사용량이 부족해서</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="유료 전용 기능이 필요해서"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="2" stroke="#4E7C6B" stroke-width="1.4"/><path d="M10 7v6M7 10h6" stroke="#4E7C6B" stroke-width="1.5" stroke-linecap="round"/></svg></div><div class="opt-body"><strong>유료 전용 기능이 필요해서</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="업무 효율 대비 충분히 가치 있어서"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="#4E7C6B" stroke-width="1.4"/><path d="M10 7v1M10 12v1M7.5 10a2.5 1.5 0 1 0 5 0 2.5 1.5 0 0 0-5 0z" stroke="#4E7C6B" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="opt-body"><strong>업무 효율 대비 충분히 가치 있어서</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="기타(유료이유)" data-is-other="true"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><circle cx="5" cy="10" r="1.5" fill="#4E7C6B"/><circle cx="10" cy="10" r="1.5" fill="#4E7C6B"/><circle cx="15" cy="10" r="1.5" fill="#4E7C6B"/></svg></div><div class="opt-body"><strong>기타</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="oe" id="oe-q3_pay"><input placeholder="직접 입력해 주세요" data-ak="q3_pay_other"></div>
-        </div>
-      </div>
-
-      <!-- PANEL 9: Q4 써보고 싶은 AI -->
-      <div class="panel" data-pid="9" data-key="q4_want" data-type="text">
-        <div class="p-step"><div class="p-step-dot"></div>Q4</div>
-        <div class="p-icon"><svg viewBox="0 0 26 26" fill="none"><path d="M13 21C13 21 4 15.5 4 9.5C4 7 5.8 5 8.5 5C10.2 5 11.7 6 13 7.5C14.3 6 15.8 5 17.5 5C20.2 5 22 7 22 9.5C22 15.5 13 21 13 21Z" stroke="#4E7C6B" stroke-width="1.7" stroke-linejoin="round" fill="#EAF2EE"/></svg></div>
-        <div class="p-title">써보고 싶은<br>AI 도구가 있나요?</div>
-        <div class="p-sub">도구명을 적어주세요. 없으면 "없음"이라고 쓰셔도 돼요</div>
-        <div class="ta"><textarea id="q4t" placeholder="예: Perplexity, Midjourney, Suno 등" rows="3"></textarea></div>
-      </div>
-
-      <!-- PANEL 10: Q4-1 이유 -->
-      <div class="panel" data-pid="10" data-key="q4_why_want" data-type="multi">
-        <div class="p-step"><div class="p-step-dot"></div>Q4-1 · 추가 질문</div>
-        <div class="p-icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="10" r="5" stroke="#4E7C6B" stroke-width="1.7"/><path d="M8 20c0-3 1.8-4 4-4s4 1 4 4" stroke="#4E7C6B" stroke-width="1.7" stroke-linecap="round"/></svg></div>
-        <div class="p-title">써보고 싶은<br>이유가 뭔가요?</div>
-        <div class="p-sub">해당하는 항목을 모두 골라주세요</div>
-        <div class="opts">
-          <div class="opt" data-value="화제가 되어 궁금해서"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="#4E7C6B" stroke-width="1.4"/><path d="M10 14v-1M10 7a2 2 0 0 1 1.5 3.3c-.5.5-1.5.9-1.5 1.7" stroke="#4E7C6B" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="opt-body"><strong>화제가 되어 궁금해서</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="내 업무에 딱 맞을 것 같아서"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="2" stroke="#4E7C6B" stroke-width="1.4"/><path d="M7 10l2 2 4-4" stroke="#4E7C6B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="opt-body"><strong>내 업무에 딱 맞을 것 같아서</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="현재 도구보다 더 나을 것 같아서"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><path d="M4 15l4-5 3 3 3-4 4 2" stroke="#4E7C6B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="opt-body"><strong>현재 도구보다 더 나을 것 같아서</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="특정 기능이 마음에 들어서" data-inline="ie-liked"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><path d="M4 12V8a6 6 0 0 1 12 0v4" stroke="#4E7C6B" stroke-width="1.4" stroke-linecap="round"/><path d="M3 12h2v3H3zM15 12h2v3h-2z" fill="#4E7C6B" opacity=".4"/></svg></div><div class="opt-body"><strong>특정 기능이 마음에 들어서</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="ie" id="ie-liked"><input placeholder="어떤 기능이 마음에 드셨나요?" data-ak="q4_liked_func"></div>
-          <div class="opt" data-value="주변에서 좋다고 해서"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><path d="M10 4a3 3 0 1 1 0 6 3 3 0 0 1 0-6zM4 17c0-3 2.7-5 6-5s6 2 6 5" stroke="#4E7C6B" stroke-width="1.4" stroke-linecap="round"/></svg></div><div class="opt-body"><strong>주변에서 좋다고 해서</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="기타(써보고싶은이유)" data-is-other="true"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><circle cx="5" cy="10" r="1.5" fill="#4E7C6B"/><circle cx="10" cy="10" r="1.5" fill="#4E7C6B"/><circle cx="15" cy="10" r="1.5" fill="#4E7C6B"/></svg></div><div class="opt-body"><strong>기타</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="oe" id="oe-q4_why"><input placeholder="직접 입력해 주세요" data-ak="q4_why_other"></div>
-        </div>
-      </div>
-
-      <!-- PANEL 11: Q5 필수 -->
-      <div class="panel" data-pid="11" data-key="q5_want_task" data-type="textarea">
-        <div class="p-step"><div class="p-step-dot"></div>Q5 <span class="req">필수</span></div>
-        <div class="p-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="#4E7C6B" stroke-width="1.7"/><path d="M8 9h8M8 13h8M8 17h5" stroke="#4E7C6B" stroke-width="1.5" stroke-linecap="round"/></svg></div>
-        <div class="p-title">AI로 해결하고 싶은<br>업무가 있나요?</div>
-        <div class="p-sub">어떤 업무인지, AI를 쓰고 싶은 이유를 구체적으로 적어주세요</div>
-        <div class="ta"><textarea id="q5t" placeholder="예: 주간보고 초안 자동화, 아이디어 회의 보조..." style="min-height:90px"></textarea></div>
-        <div class="hint">
-          <div class="hint-label">작성 예시</div>
-          <div class="hint-row"><div class="hdot"></div><span>매일 팀에 업계 뉴스를 공유하는데, 핵심 내용만 자동으로 모아서 정리해주는 봇이 있으면 시간을 많이 아낄 수 있을 것 같아요.</span></div>
-          <div class="hint-row"><div class="hdot"></div><span>기획서 작성 시 레퍼런스를 찾고 시각화하는 작업이 오래 걸려요. AI가 초안을 잡아주면 속도가 훨씬 빨라질 것 같아요.</span></div>
-          <div class="hint-row"><div class="hdot"></div><span>매주 반복되는 주간보고 초안을 AI가 잡아준다면, 내용 검토에만 집중할 수 있을 것 같아요.</span></div>
-          <div class="hint-row"><div class="hdot"></div><span>글로벌 팀과 소통할 때 번역에 시간이 많이 들어요. 맥락에 맞는 번역을 빠르게 해주는 툴이 있으면 좋겠어요.</span></div>
-        </div>
-        <div class="err" id="e11">내용을 입력해 주세요</div>
-      </div>
-
-      <!-- PANEL 12: Q7 망설임 -->
-      <div class="panel" data-pid="12" data-key="q7_hesitate" data-type="multi">
-        <div class="p-step warn"><div class="p-step-dot"></div>Q6</div>
-        <div class="p-icon warn-ic"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#C0624A" stroke-width="1.7"/><path d="M12 7v6" stroke="#C0624A" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="17" r="1.3" fill="#C0624A"/></svg></div>
-        <div class="p-title">새 AI를 쓸 때<br>망설이게 되는 이유는요?</div>
-        <div class="p-sub">해당하는 항목을 모두 골라주세요</div>
-        <div class="opts">
-          <div class="opt" data-value="무료 플랜이 없거나 너무 제한적"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="#4E7C6B" stroke-width="1.4"/><path d="M10 6v8M7.5 8.5h4a1.5 1.5 0 0 1 0 3h-4" stroke="#4E7C6B" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="opt-body"><strong>무료 플랜이 없거나 너무 제한적</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="구독료가 부담스러움"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="7" width="14" height="10" rx="2" stroke="#4E7C6B" stroke-width="1.4"/><path d="M7 7V6a3 3 0 0 1 6 0v1" stroke="#4E7C6B" stroke-width="1.4"/></svg></div><div class="opt-body"><strong>구독료가 부담스러움</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="어떻게 활용하는지 모르겠음"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="#4E7C6B" stroke-width="1.4"/><path d="M10 14v-1M10 7a2 2 0 0 1 1.5 3.3c-.5.5-1.5.9-1.5 1.7" stroke="#4E7C6B" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="opt-body"><strong>어떻게 활용하는지 모르겠음</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="익히는 데 시간이 걸릴 것 같음"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7.5" stroke="#4E7C6B" stroke-width="1.5"/><path d="M10 6v4l2.5 2.5" stroke="#4E7C6B" stroke-width="1.5" stroke-linecap="round"/></svg></div><div class="opt-body"><strong>익히는 데 시간이 걸릴 것 같음</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="결과물 정확성·신뢰도 걱정"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><path d="M10 3l6.5 3v5c0 3-2.5 5.5-6.5 6.5C3.5 16.5 1 14 1 11V6l9-3z" stroke="#4E7C6B" stroke-width="1.4" stroke-linejoin="round"/></svg></div><div class="opt-body"><strong>결과물 정확성·신뢰도 걱정</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="데이터 보안·개인정보 걱정"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="8" width="14" height="10" rx="2" stroke="#4E7C6B" stroke-width="1.4"/><path d="M7 8V6a3 3 0 0 1 6 0v2" stroke="#4E7C6B" stroke-width="1.4"/><circle cx="10" cy="13" r="1.5" fill="#4E7C6B" opacity=".4"/></svg></div><div class="opt-body"><strong>데이터 보안·개인정보 걱정</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="지금 도구로 충분함"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="#4E7C6B" stroke-width="1.4"/><path d="M7 10l2 2 4-4" stroke="#4E7C6B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="opt-body"><strong>지금 도구로 충분함</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="opt" data-value="기타(망설임)" data-is-other="true"><div class="opt-ic"><svg viewBox="0 0 20 20" fill="none"><circle cx="5" cy="10" r="1.5" fill="#4E7C6B"/><circle cx="10" cy="10" r="1.5" fill="#4E7C6B"/><circle cx="15" cy="10" r="1.5" fill="#4E7C6B"/></svg></div><div class="opt-body"><strong>기타</strong></div><div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-          <div class="oe" id="oe-q7"><input placeholder="직접 입력해 주세요" data-ak="q7_other"></div>
-        </div>
-        <div class="err" id="e12">항목을 하나 이상 선택해 주세요</div>
-      </div>
-
     </div>
 
-    <div class="card-nav" id="card-nav">
-      <button class="btn-back-card" id="btn-back" style="visibility:hidden">이전</button>
-      <span class="nav-step" id="nav-step"></span>
-      <button class="btn-next-card" id="btn-next">다음</button>
+    <!-- 오른쪽 설문 -->
+    <div class="form">
+      <div class="f-top">
+        <div class="f-dots" id="dots"></div>
+        <div class="f-step-num" id="step-num"></div>
+      </div>
+      <div id="panel-area" style="flex:1;display:flex;flex-direction:column"></div>
+      <div class="f-nav">
+        <button class="btn-back" id="btn-back">이전</button>
+        <span class="f-step-txt" id="step-txt"></span>
+        <button class="btn-next" id="btn-next">다음</button>
+      </div>
     </div>
   </div>
 
   <div class="submitting" id="submitting">
     <div class="spinner"></div>
-    <p style="font-size:14px;color:#5C6B65">Notion에 저장하는 중...</p>
+    <p style="font-size:14px;color:var(--t2)">저장하는 중...</p>
   </div>
 
   <div class="done" id="done">
-    <img src="data:image/png;base64,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" alt="" style="width:160px;height:160px;object-fit:cover;border-radius:20px;margin-bottom:20px;">
-    <h2>응답 완료!</h2>
-    <p style="margin-top:8px">바쁜 시간 내어 응답해 주셔서 감사해요 🙏</p>
+    <div id="done-confetti" style="position:absolute;inset:0;pointer-events:none;overflow:hidden"></div>
+    <div style="position:relative;width:160px;height:160px;margin:0 auto 24px">
+      <svg width="160" height="160" viewBox="0 0 150 150">
+        <text x="75" y="105" text-anchor="middle" font-family="'Barlow Condensed',system-ui" font-size="130" font-weight="800" font-style="normal"
+          fill="none" stroke="#D6E8A0" stroke-width="8" dominant-baseline="middle">8</text>
+        <text id="done-8-stroke" x="75" y="105" text-anchor="middle" font-family="'Barlow Condensed',system-ui" font-size="130" font-weight="800" font-style="normal"
+          fill="none" stroke="#8DC63F" stroke-width="5" stroke-linecap="round"
+          stroke-dasharray="700" stroke-dashoffset="700" dominant-baseline="middle">8</text>
+      </svg>
+      <div id="done-check" style="position:absolute;bottom:0;right:0;width:44px;height:44px;background:#8DC63F;border-radius:50%;display:flex;align-items:center;justify-content:center;opacity:0;transform:scale(0)">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <polyline id="done-check-poly" points="5,12 10,17 19,7" stroke="white" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round"
+            stroke-dasharray="60" stroke-dashoffset="60"/>
+        </svg>
+      </div>
+    </div>
+    <h2 id="done-title" style="opacity:0;transform:translateY(10px);transition:opacity .5s,transform .5s">응답 완료!</h2>
+    <p id="done-sub" style="margin-top:8px;opacity:0;transform:translateY(10px);transition:opacity .5s .15s,transform .5s .15s">바쁜 시간 내어 응답해 주셔서 감사합니다.</p>
+    <p id="done-fun" style="margin-top:14px;font-size:13px;color:#5A8A20;font-weight:500;background:#F0F7E0;padding:10px 20px;border-radius:12px;opacity:0;transform:translateY(10px);transition:opacity .5s .3s,transform .5s .3s;line-height:1.7">응답해 주신 내용은 퍼블리싱사업8실 실원 여러분의<br>AI 스킬업을 위해 활용될 예정입니다 <svg style="display:inline-block;vertical-align:middle;margin-left:4px" width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M10 17S3 12.5 3 7.5A4 4 0 0 1 10 5a4 4 0 0 1 7 2.5C17 12.5 10 17 10 17z" fill="#C0624A" opacity=".85"/></svg></p>
   </div>
 </div>
 
 <script>
-const NOTION_API_KEY = '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';
-const NOTION_DB_ID  = '6313d2a7af684a13b330ee1ab042a46d';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyARdUHDyoYKktWqtY5aHddad1Y2VYIaNLn16jv5UFcrT-aDmTvtwPD9c71AtU0FXpe/exec';
 const ans = {};
-const allPanels = [...document.querySelectorAll('.panel')];
+
+const TOOLS = ['ChatGPT','Claude','Gemini','Copilot','Grok','Perplexity','NotebookLM','Midjourney','DALL·E','Adobe Firefly','Canva AI','Sora','Runway','HeyGen','ElevenLabs','Cursor','GitHub Copilot','Notion AI','뤼튼(Wrtn)'];
+
+// 패널 정의
+const PANELS = [
+  // 0: 성함
+  {id:'name', step:'시작하기 전에', title:'성함을\n입력해 주세요', sub:'응답 데이터에 함께 저장돼요', type:'name',
+   vis:{desc:'팀 AI 활용 현황 조사', sub:'시작하기 전에 성함을 알려주세요 :)'}},
+
+  // Q1: 진입장벽
+  {id:'q1', step:'Q1', title:'AI를 활용하려 할 때\n망설이는 이유가 있나요?', sub:'해당하는 항목을 모두 골라주세요', type:'multi',
+   vis:{desc:'AI 활용의 진입장벽', sub:'솔직하게 답해주세요 :)'},
+   opts:[
+     {v:'뭐부터 시작해야 할지 모르겠음 (온보딩 막막함)', ic:'<svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.5"/><path d="M10 13v-1c0-1 2.5-1.5 2.5-3.5a2.5 2.5 0 0 0-5 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="10" cy="14.5" r=".8" fill="currentColor"/></svg>'},
+     {v:'업무에 어떤 AI를 어떻게 활용할지 감이 안 옴', ic:'<svg viewBox="0 0 20 20" fill="none"><rect x="3" y="7" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M7 7V5a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M3 11h14" stroke="currentColor" stroke-width="1.5"/></svg>'},
+     {v:'익히는 데 시간이 걸릴 것 같음', ic:'<svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="11" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M10 7v4l2.5 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M7.5 2.5h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>'},
+     {v:'잘못 쓰면 오히려 효율이 더 떨어질 것 같아서', ic:'<svg viewBox="0 0 20 20" fill="none"><path d="M3 5l4 5 3-2 4 5 3-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 15h3v-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'},
+     {v:'데이터 보안·개인정보 걱정', ic:'<svg viewBox="0 0 20 20" fill="none"><rect x="4" y="9" width="12" height="9" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M7 9V6a3 3 0 0 1 6 0v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="10" cy="13.5" r="1.2" fill="currentColor"/></svg>'},
+     {v:'결과물의 정확성·신뢰도 걱정', ic:'<svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="10" r="4" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="10" r="1.5" fill="currentColor"/></svg>'},
+     {v:'기타', ic:'<svg viewBox="0 0 20 20" fill="none"><path d="M4 16l2-4L14 4l2 2-8 8-4 2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>', other:true},
+   ]},
+
+  // Q2: 특정 툴 장벽
+  {id:'q2', step:'Q2', title:'특정 AI 툴을 써보려 했을 때\n부딪힌 장벽이 있었나요?', sub:'해당하는 항목을 모두 골라주세요', type:'multi_exclusive',
+   vis:{desc:'AI 툴 사용 시 장벽', sub:'경험한 것들을 골라주세요'},
+   exclusive:'AI 활용을 시도해 본 적이 없음',
+   opts:[
+     {v:'AI 활용을 시도해 본 적이 없음', ic:'<svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.5"/><path d="M5 15L15 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>'},
+     {v:'무료 플랜이 너무 제한적이거나 유료 구독료가 부담임', ic:'<svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.5"/><path d="M10 6v8M7.5 8.5h4a1.5 1.5 0 0 1 0 3h-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>'},
+     {v:'가볍게 진입하기에 프로그램의 학습 난이도가 너무 높았음', ic:'<svg viewBox="0 0 20 20" fill="none"><path d="M3 5h14M3 9h14M3 13h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="15" cy="14" r="3.5" stroke="currentColor" stroke-width="1.4"/><path d="M17.5 16.5l2 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>'},
+     {v:'트렌드가 빨리 바뀌어서 이걸 쓰는 게 맞을지 확신이 안 섬', ic:'<svg viewBox="0 0 20 20" fill="none"><path d="M10 4a6 6 0 1 1-4.24 1.76" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M4 3v4h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'},
+     {v:'업무에 쓰고 싶지만 회사 보안 정책상 사용이 제한됨', ic:'<svg viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M3 8h14M8 8v9" stroke="currentColor" stroke-width="1.5"/></svg>'},
+     {v:'한국어 지원이 부족하거나 불편함', ic:'<svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.5"/><path d="M3 10h14M10 3c-2 2.5-2 9.5 0 14M10 3c2 2.5 2 9.5 0 14" stroke="currentColor" stroke-width="1.4"/></svg>'},
+     {v:'기존 도구로 충분해서 굳이 새로 배울 필요가 없음', ic:'<svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.5"/><path d="M7 10l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'},
+     {v:'써봤지만 기대 이하였음', ic:'<svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.5"/><path d="M7 13c.8-1.5 5.2-1.5 6 0" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="7.5" cy="8.5" r="1" fill="currentColor"/><circle cx="12.5" cy="8.5" r="1" fill="currentColor"/></svg>', other:true, otherPlaceholder:'어떤 점이 아쉬웠나요?'},
+     {v:'기타', ic:'<svg viewBox="0 0 20 20" fill="none"><path d="M4 16l2-4L14 4l2 2-8 8-4 2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>', other:true},
+   ]},
+
+  // Q3: 현재 활용 여부 YES/NO
+  {id:'q3', step:'Q3', title:'현재 AI 도구를\n활용하고 계신가요?', sub:'', type:'single_auto',
+   vis:{desc:'현재 AI 활용 여부', sub:''},
+   opts:[
+     {v:'네, 활용 중이에요', ic:'<svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.5"/><path d="M7 10l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'},
+     {v:'아니요, 활용하지 않고 있어요', ic:'<svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.5"/><path d="M7 7l6 6M13 7l-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>'},
+   ]},
+
+  // Q3-1: 어디서 활용
+  {id:'q3_1', step:'Q3-1', title:'어디에 사용 중이신가요?', sub:'해당하는 항목을 모두 골라주세요', type:'multi',
+   condKey:'q3', condVal:'네, 활용 중이에요',
+   vis:{desc:'AI 활용 영역', sub:''},
+   opts:[
+     {v:'업무 활용', ic:'<svg viewBox="0 0 20 20" fill="none"><rect x="3" y="7" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M7 7V5a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>'},
+     {v:'개인 활용', ic:'<svg viewBox="0 0 20 20" fill="none"><path d="M3 10L10 3l7 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 10v7h10v-7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'},
+   ]},
+
+  // Q3-2: 빈도
+  {id:'q3_2', step:'Q3-2', title:'활용 빈도는 어떤가요?', sub:'', type:'single_auto',
+   condKey:'q3', condVal:'네, 활용 중이에요',
+   vis:{desc:'AI 활용 빈도', sub:'하나를 고르면 자동으로 넘어가요'},
+   opts:[
+     {v:'거의 매일', ic:'<svg viewBox="0 0 20 20" fill="none"><path d="M10 3c0 4-4 5-4 9a4 4 0 0 0 8 0c0-4-4-5-4-9z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M8.5 14.5c.5 1 2.5 1 3 0" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>', sub:'업무 흐름에 AI가 있어요'},
+     {v:'주 1~3회', ic:'<svg viewBox="0 0 20 20" fill="none"><rect x="3" y="4" width="14" height="13" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M3 9h14M7 3v2M13 3v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>', sub:'정기적으로 활용해요'},
+     {v:'월 1~3회', ic:'<svg viewBox="0 0 20 20" fill="none"><rect x="3" y="4" width="14" height="13" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M3 9h14M7 3v2M13 3v2M7 13h2M11 13h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>', sub:'필요할 때 가끔 써요'},
+     {v:'거의 안 씀', ic:'<svg viewBox="0 0 20 20" fill="none"><path d="M5 10h10M8 7h6M11 13h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>', sub:'아직 익숙하지 않아요'},
+   ]},
+
+  // Q4: 툴 선택 + 별점
+  {id:'q4', step:'Q4', title:'업무에 활용 중인 AI 툴이 있나요?\n어느 정도로 활용 중인가요?', sub:'해당하는 툴을 모두 선택하고 별점을 매겨주세요', type:'tools',
+   condKey:'q3_1', condIncludes:'업무 활용',
+   vis:{desc:'업무 활용 AI 툴', sub:'선택 후 별점을 매겨주세요'}},
+
+  // Q5: 계속 쓰는 이유
+  {id:'q5', step:'Q5', title:'사용 중인 AI를 계속 쓰실\n계획이라면, 이유가 있나요?', sub:'가장 가까운 하나를 골라주세요', type:'single',
+   condKey:'q3', condVal:'네, 활용 중이에요',
+   vis:{desc:'계속 사용하는 이유', sub:''},
+   opts:[
+     {v:'회사에서 제공해주는 서비스라 따로 고민 없이 계속 쓸 것 같음', ic:'<svg viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M3 8h14M8 8v9" stroke="currentColor" stroke-width="1.5"/></svg>'},
+     {v:'써보니 좋기도 하고, 익숙해져서 관성적으로 계속 쓰게 됨', ic:'<svg viewBox="0 0 20 20" fill="none"><path d="M4 10a6 6 0 0 1 10-4.47M16 10a6 6 0 0 1-10 4.47" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M14 4l2 1.5-1.5 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>'},
+     {v:'주변 동료들도 같은 툴을 써서 공유·소통하기 편함', ic:'<svg viewBox="0 0 20 20" fill="none"><circle cx="7" cy="7" r="3" stroke="currentColor" stroke-width="1.5"/><circle cx="13" cy="7" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M1 17c0-3 2.7-5 6-5M19 17c0-3-2.7-5-6-5M10 12c2.5 0 5 1.5 5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>'},
+     {v:'새로운 걸 시도하고 싶은데 어떤 게 나은지 정보가 없음', ic:'<svg viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="5.5" stroke="currentColor" stroke-width="1.5"/><path d="M13.5 13.5L17 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>'},
+     {v:'최신 AI 트렌드를 찾아보고 능동적으로 바꿔가는 중', ic:'<svg viewBox="0 0 20 20" fill="none"><path d="M10 3c2 0 5 2 5 7l-2 1-1 4H8l-1-4-2-1c0-5 3-7 5-7z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 15v2h4v-2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>'},
+     {v:'기타', ic:'<svg viewBox="0 0 20 20" fill="none"><path d="M4 16l2-4L14 4l2 2-8 8-4 2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>', other:true},
+   ]},
+
+  // Q6: 불만 서술
+  {id:'q6', step:'Q6', title:'사용 중인 AI에\n불만은 없나요?', sub:'어떤 AI인지, 어떤 점이 불만인지 자유롭게 적어주세요', type:'textarea',
+   condKey:'q3', condVal:'네, 활용 중이에요',
+   placeholder:'예: ChatGPT — 무료 플랜 사용량이 너무 적어요\n없음',
+   vis:{desc:'AI 불만 사항', sub:'없으면 "없음"이라고 써주세요'}},
+
+  // Q7: 도입 희망 툴
+  {id:'q7', step:'Q7', title:'회사 돈으로 업무에 활용해\n보고 싶은 툴이 있나요?', sub:'도입을 추천하는 AI 툴이 있다면 함께 써주세요', type:'textarea',
+   placeholder:'예: Perplexity — 리서치할 때 출처가 명확해서 업무 신뢰도가 높아질 것 같아요\n없음',
+   hint:['Perplexity — 리서치할 때 출처가 명확해서 업무 신뢰도가 높아질 것 같아요','Midjourney — 발표 자료 이미지 직접 만들면 외주 비용을 줄일 수 있을 것 같아요','Fireflies — 회의 자동 녹취·요약이 되면 회의록 작성 시간을 줄일 수 있을 것 같아요','없음 — 현재 제공되는 툴로 충분해요'],
+   vis:{desc:'도입 희망 AI 툴', sub:'어떤 툴이 필요한지 알려주세요'}},
+
+  // Q8: 활용 아이디어
+  {id:'q8', step:'Q8', title:'AI를 활용하고 싶은 업무나\n아이디어가 있나요?', sub:'구체적으로 적어주세요', type:'textarea',
+   placeholder:'예: 매주 반복되는 주간보고 초안을 AI가 잡아준다면 좋겠어요\n예: 발표 자료 초안을 AI가 잡아주면 디자인보다 내용 구성에 집중할 수 있을 것 같아요',
+   hint:['매주 반복되는 주간보고 초안을 AI가 잡아준다면, 내용 검토에만 집중할 수 있을 것 같아요','경쟁사 동향을 자동으로 모아서 요약해주는 봇이 있으면 리서치 시간을 줄일 수 있을 것 같아요','글로벌 팀과 소통할 때 번역에 시간이 많이 들어요. 맥락에 맞는 번역 툴이 있으면 좋겠어요','발표 자료 초안을 AI가 잡아주면, 디자인보다 내용 구성에 더 집중할 수 있을 것 같아요'],
+   vis:{desc:'AI 활용 아이디어', sub:'어떤 업무에 활용하고 싶으신가요?'}},
+];
+
+let flowIdx = 0;
 
 function getFlow(){
-  return allPanels.filter(function(p){
-    var ck=p.dataset.condKey, cv=p.dataset.condVal, cn=p.dataset.condNot, ci=p.dataset.condIncludes;
-    if(!ck) return true;
-    var v=ans[ck];
-    if(cv) return v===cv;
-    if(cn) return v!==cn && v!==undefined;
-    if(ci) return Array.isArray(v) && v.includes(ci);
+  return PANELS.filter(p => {
+    if(!p.condKey) return true;
+    const v = ans[p.condKey];
+    if(p.condVal) return v === p.condVal;
+    if(p.condIncludes) return Array.isArray(v) && v.includes(p.condIncludes);
     return true;
   });
 }
 
-var flowIdx=0;
 function currentPanel(){ return getFlow()[flowIdx]; }
 
-function renderDots(){
-  var flow=getFlow();
-  document.getElementById('dots').innerHTML = flow.map(function(p,i){
-    return '<div class="dot '+(i<flowIdx?'done':i===flowIdx?'active':'')+'"></div>';
-  }).join('');
+function updateDots(){
+  const flow = getFlow();
+  document.getElementById('dots').innerHTML = flow.map((_,i) =>
+    `<div class="f-dot ${i<flowIdx?'done':i===flowIdx?'active':''}"></div>`
+  ).join('');
+  document.getElementById('step-num').textContent = (flowIdx+1)+' / '+flow.length;
+  document.getElementById('step-txt').textContent = (flowIdx+1)+' / '+flow.length;
 }
 
-function slideTo(panel){
-  var idx = allPanels.indexOf(panel);
-  document.getElementById('slider').style.transform = 'translateX(-'+idx*100+'%)';
+function updateVis(p){
+  const v = p.vis || {};
+  document.getElementById('vis-desc').textContent = v.desc||'';
+  document.getElementById('vis-sub').textContent = v.sub||'';
+  // Q4에서만 별점 기준표 표시
+  const sg = document.getElementById('star-guide');
+  sg.style.display = p.id==='q4' ? 'block' : 'none';
+  if(p.id==='q4'){
+    sg.style.animation = 'none';
+    sg.offsetHeight; // reflow
+    sg.style.animation = 'guide-in .5s ease forwards, guide-pulse 2s ease-in-out 0.5s 3';
+  }
 }
 
-function updateNav(){
-  var flow=getFlow(), panel=currentPanel(), isAuto=panel&&panel.dataset.auto;
+function renderOpt(opt, type, key){
+  const isSel = type==='single'||type==='single_auto'
+    ? ans[key]===opt.v
+    : Array.isArray(ans[key]) && ans[key].includes(opt.v);
+  const box = type==='single'||type==='single_auto'
+    ? `<div class="radio ${isSel?'sel':''}"></div>`
+    : `<div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>`;
+  return `<div class="opt ${isSel?'sel':''}" data-value="${opt.v.replace(/"/g,'&quot;')}">
+    <div class="opt-ic">${opt.ic||''}</div>
+    <div class="opt-body"><strong>${opt.v}</strong>${opt.sub?`<span>${opt.sub}</span>`:''}</div>
+    ${box}
+  </div>`;
+}
+
+function renderPanel(){
+  const p = currentPanel();
+  if(!p) return;
+  updateDots();
+  updateVis(p);
+
+  const area = document.getElementById('panel-area');
+  area.innerHTML = '';
+
+  // 스텝 레이블
+  const stepEl = document.createElement('div');
+  stepEl.className='f-step';
+  stepEl.innerHTML=`<div class="f-step-dot"></div>${p.step}`;
+  area.appendChild(stepEl);
+
+  // 제목
+  const titleEl = document.createElement('div');
+  titleEl.className='f-title';
+  titleEl.innerHTML=p.title.replace(/\n/g,'<br>');
+  area.appendChild(titleEl);
+
+  // 부제목
+  if(p.sub){
+    const subEl = document.createElement('div');
+    subEl.className='f-sub';
+    subEl.textContent=p.sub;
+    area.appendChild(subEl);
+  }
+
+  // 타입별 렌더링
+  if(p.type==='name'){
+    const wrap = document.createElement('div');
+    wrap.className='name-ta';
+    wrap.innerHTML=`<input type="text" id="name-inp" placeholder="예: 홍길동" value="${ans.name||''}">`;
+    area.appendChild(wrap);
+    const err = document.createElement('div');
+    err.className='err'; err.id='err-name'; err.textContent='성함을 입력해 주세요';
+    area.appendChild(err);
+    document.getElementById('name-inp').addEventListener('input',function(){ ans.name=this.value.trim(); });
+  }
+  else if(p.type==='textarea'){
+    const wrap = document.createElement('div');
+    wrap.className='ta';
+    wrap.innerHTML=`<textarea id="ta-inp" placeholder="${p.placeholder||''}" rows="4">${ans[p.id]||''}</textarea>`;
+    area.appendChild(wrap);
+    if(p.hint){
+      const h = document.createElement('div');
+      h.className='hint';
+      h.innerHTML=`<div class="hint-label">작성 예시</div>`+p.hint.map(t=>`<div class="hint-row"><div class="hdot"></div><span>${t}</span></div>`).join('');
+      area.appendChild(h);
+    }
+    document.getElementById('ta-inp').addEventListener('input',function(){ ans[p.id]=this.value; });
+  }
+  else if(p.type==='tools'){
+    const grid = document.createElement('div');
+    grid.className='tool-grid';
+    const toolAns = ans.q4_tools || {};
+    TOOLS.forEach(tool=>{
+      const isSel = !!toolAns[tool];
+      const stars = toolAns[tool]||0;
+      const item = document.createElement('div');
+      item.className='tool-item';
+      const starsHtml = [1,2,3,4,5].map(i=>`<span class="star ${i<=stars?'on':''}" data-tool="${tool}" data-star="${i}">★</span>`).join('');
+      item.innerHTML=`
+        <div class="tool-opt ${isSel?'sel':''}" data-tool="${tool}">
+          <strong>${tool}</strong>
+          <div class="tool-cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        </div>
+        <div class="tool-stars ${isSel?'show':''}" id="stars-${tool.replace(/[^a-zA-Z0-9]/g,'_')}">
+          <span style="font-size:11px;color:var(--t2);margin-right:4px">활용도</span>
+          ${starsHtml}
+        </div>`;
+      grid.appendChild(item);
+    });
+    // 기타
+    const otherSel = !!(ans.q4_other);
+    const otherItem = document.createElement('div');
+    otherItem.className='tool-item';
+    otherItem.innerHTML=`
+      <div class="tool-opt ${otherSel?'sel':''}" data-tool="__other__">
+        <strong>기타</strong>
+        <div class="tool-cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="other-input ${otherSel?'show':''}"><input placeholder="직접 입력" value="${ans.q4_other||''}"></div>`;
+    grid.appendChild(otherItem);
+    area.appendChild(grid);
+
+    // 툴 클릭
+    grid.querySelectorAll('.tool-opt').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const tool = btn.dataset.tool;
+        if(tool==='__other__'){
+          btn.classList.toggle('sel');
+          const oi = btn.nextElementSibling;
+          if(oi) oi.classList.toggle('show', btn.classList.contains('sel'));
+          if(!btn.classList.contains('sel')) ans.q4_other='';
+        } else {
+          if(!ans.q4_tools) ans.q4_tools={};
+          btn.classList.toggle('sel');
+          const starsDiv = document.getElementById('stars-'+tool.replace(/[^a-zA-Z0-9]/g,'_'));
+          const on = btn.classList.contains('sel');
+          if(starsDiv) starsDiv.classList.toggle('show', on);
+          if(!on) delete ans.q4_tools[tool];
+          else ans.q4_tools[tool] = ans.q4_tools[tool]||0;
+        }
+      });
+    });
+
+    // 별점 클릭
+    grid.querySelectorAll('.tool-stars .star').forEach(star=>{
+      star.addEventListener('click',()=>{
+        const tool=star.dataset.tool, n=parseInt(star.dataset.star);
+        if(!ans.q4_tools) ans.q4_tools={};
+        ans.q4_tools[tool]=n;
+        const starsDiv=document.getElementById('stars-'+tool.replace(/[^a-zA-Z0-9]/g,'_'));
+        if(starsDiv) starsDiv.querySelectorAll('.star').forEach(s=> s.classList.toggle('on', parseInt(s.dataset.star)<=n));
+      });
+    });
+
+    // 기타 입력
+    const otherInp = otherItem.querySelector('input');
+    if(otherInp) otherInp.addEventListener('input',function(){ ans.q4_other=this.value; });
+  }
+  else {
+    // single / single_auto / multi / multi_exclusive
+    const optsEl = document.createElement('div');
+    optsEl.className='opts';
+
+    (p.opts||[]).forEach(opt=>{
+      const type = p.type==='multi_exclusive' ? 'multi' : p.type;
+      const isSel = (p.type==='single'||p.type==='single_auto')
+        ? ans[p.id]===opt.v
+        : Array.isArray(ans[p.id]) && ans[p.id].includes(opt.v);
+
+      const div = document.createElement('div');
+      div.className=`opt ${isSel?'sel':''}`;
+
+      const boxHtml = (p.type==='single'||p.type==='single_auto')
+        ? `<div class="radio"></div>`
+        : `<div class="cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>`;
+
+      div.innerHTML=`<div class="opt-ic">${opt.ic||''}</div>
+        <div class="opt-body"><strong>${opt.v}</strong>${opt.sub?`<span>${opt.sub}</span>`:''}</div>
+        ${boxHtml}`;
+
+      div.addEventListener('click',()=>{
+        if(p.type==='single'||p.type==='single_auto'){
+          ans[p.id]=opt.v;
+          renderPanel();
+          if(p.type==='single_auto'){
+            // Q3 NO → skip to Q7
+            if(p.id==='q3' && opt.v==='아니요, 활용하지 않고 있어요'){
+              setTimeout(()=>{ skipToId('q7'); },220);
+            } else {
+              setTimeout(()=>goNext(),220);
+            }
+          }
+        } else {
+          // multi / multi_exclusive
+          if(!Array.isArray(ans[p.id])) ans[p.id]=[];
+          if(p.exclusive && opt.v===p.exclusive){
+            // 단독 선택
+            ans[p.id]=[opt.v];
+            renderPanel();
+            setTimeout(()=>goNext(),220);
+            return;
+          }
+          // 다른 항목 선택 시 exclusive 제거
+          if(p.exclusive){
+            ans[p.id]=ans[p.id].filter(v=>v!==p.exclusive);
+          }
+          const idx2=ans[p.id].indexOf(opt.v);
+          if(idx2>=0) ans[p.id].splice(idx2,1);
+          else ans[p.id].push(opt.v);
+          renderPanel();
+        }
+      });
+
+      optsEl.appendChild(div);
+
+      // 기타 입력란
+      if(opt.other){
+        const oe = document.createElement('div');
+        oe.className=`other-input ${isSel?'show':''}`;
+        const pholder = opt.otherPlaceholder||'직접 입력해 주세요';
+        const otherKey = p.id+'_other_'+opt.v;
+        oe.innerHTML=`<input placeholder="${pholder}" value="${ans[otherKey]||''}">`;
+        oe.querySelector('input').addEventListener('input',function(){ ans[otherKey]=this.value; });
+        optsEl.appendChild(oe);
+      }
+    });
+
+    area.appendChild(optsEl);
+
+    const err=document.createElement('div');
+    err.className='err'; err.id='err-opt'; err.textContent='항목을 선택해 주세요';
+    area.appendChild(err);
+  }
+
+  const flow=getFlow();
   document.getElementById('btn-back').style.visibility = flowIdx===0?'hidden':'visible';
   document.getElementById('btn-next').textContent = flowIdx===flow.length-1?'제출하기':'다음';
-  document.getElementById('btn-next').style.display = isAuto?'none':'inline-block';
-  document.getElementById('nav-step').textContent = (flowIdx+1)+' / '+flow.length;
-  document.querySelectorAll('.err').forEach(function(e){ e.classList.remove('show'); });
-  renderDots();
+  document.getElementById('btn-next').style.display =
+    (p.type==='single_auto' && p.id!=='q3') ? 'none' : 'inline-block';
 }
 
-function goNext(){
-  var flow=getFlow();
-  if(flowIdx>=flow.length-1){ submitToNotion(); return; }
-  flowIdx++;
-  slideTo(currentPanel());
-  updateNav();
-}
-
-function goBack(){
-  if(flowIdx<=0) return;
-  flowIdx--;
-  slideTo(currentPanel());
-  updateNav();
+function skipToId(targetId){
+  const flow=getFlow();
+  const idx=flow.findIndex(p=>p.id===targetId);
+  if(idx>=0){ flowIdx=idx; renderPanel(); }
+  else goNext();
 }
 
 function validate(){
-  var p=currentPanel();
+  const p=currentPanel();
   if(!p) return true;
-  var key=p.dataset.key, type=p.dataset.type;
-  if(type==='name'){
-    if(!ans.respondent_name||!ans.respondent_name.trim()){
-      document.getElementById('e-name').classList.add('show'); return false;
-    }
+  if(p.type==='name'){
+    if(!ans.name){ document.getElementById('err-name').classList.add('show'); return false; }
     return true;
   }
-  if(type==='text') return true;
-  if(type==='textarea'){
-    if(p.dataset.pid==='11'){
-      if(!ans.q5_want_task||!ans.q5_want_task.trim()){
-        document.getElementById('e11').classList.add('show'); return false;
-      }
-    }
+  if(p.type==='textarea') return true;
+  if(p.type==='tools') return true;
+  if(p.type==='single'||p.type==='single_auto'){
+    if(!ans[p.id]){ document.getElementById('err-opt')?.classList.add('show'); return false; }
     return true;
   }
-  if(type==='multi'){
-    var v=ans[key];
-    if(p.dataset.pid==='4'&&(!v||!v.length)){ document.getElementById('e4').classList.add('show'); return false; }
-    if(p.dataset.pid==='12'&&(!v||!v.length)){ document.getElementById('e12').classList.add('show'); return false; }
+  if(p.type==='multi'||p.type==='multi_exclusive'){
+    // multi는 선택 안 해도 넘어갈 수 있게
     return true;
   }
   return true;
 }
 
-document.getElementById('btn-next').addEventListener('click', function(){ if(!validate()) return; goNext(); });
-document.getElementById('btn-back').addEventListener('click', goBack);
-
-document.querySelectorAll('.opts').forEach(function(opts){
-  var panel=opts.closest('.panel');
-  if(!panel) return;
-  var type=panel.dataset.type, key=panel.dataset.key, isAuto=panel.dataset.auto;
-  opts.querySelectorAll('.opt').forEach(function(opt){
-    opt.addEventListener('click', function(){
-      var val=opt.dataset.value, isOther=opt.dataset.isOther, inlineId=opt.dataset.inline;
-      if(type==='single'){
-        opts.querySelectorAll('.opt').forEach(function(o){ o.classList.remove('sel'); });
-        opt.classList.add('sel');
-        ans[key]=val;
-        updateNav();
-        if(isAuto) setTimeout(function(){ if(!validate()) return; goNext(); }, 220);
-      } else {
-        opt.classList.toggle('sel');
-        var on=opt.classList.contains('sel');
-        if(isOther){
-          var s=opt.nextElementSibling;
-          if(s&&s.classList.contains('oe')) s.classList.toggle('show',on);
-        }
-        if(inlineId){ var il=document.getElementById(inlineId); if(il) il.classList.toggle('show',on); }
-        ans[key]=[...opts.querySelectorAll('.opt.sel')].map(function(o){ return o.dataset.value; });
-        updateNav();
-      }
-    });
-  });
-});
-
-document.querySelectorAll('[data-ak]').forEach(function(inp){
-  inp.addEventListener('input', function(){ ans[this.dataset.ak]=this.value; });
-});
-document.getElementById('name-input').addEventListener('input', function(){ ans.respondent_name=this.value; });
-document.getElementById('q4t').addEventListener('input', function(){ ans.q4_want=this.value; });
-document.getElementById('q5t').addEventListener('input', function(){ ans.q5_want_task=this.value; });
-
-function toSelect(val){ return val ? {select:{name: Array.isArray(val)?val[0]:val}} : undefined; }
-function toText(val){ return val ? {rich_text:[{text:{content: String(val)}}]} : undefined; }
-function toDate(){ return {date:{start: new Date().toISOString()}}; }
-function toMulti(arr){ return arr&&arr.length ? {multi_select: arr.map(function(v){ return {name:v}; })} : undefined; }
-
-function cleanArr(arr){
-  if(!arr) return [];
-  return arr.filter(function(v){ return v && !v.startsWith('기타('); });
+function goNext(){
+  if(!validate()) return;
+  const flow=getFlow();
+  if(flowIdx>=flow.length-1){ submitForm(); return; }
+  flowIdx++;
+  renderPanel();
+  window.scrollTo(0,0);
 }
 
-async function submitToNotion(){
+function goBack(){
+  if(flowIdx<=0) return;
+  flowIdx--;
+  renderPanel();
+  window.scrollTo(0,0);
+}
+
+document.getElementById('btn-next').addEventListener('click',goNext);
+document.getElementById('btn-back').addEventListener('click',goBack);
+
+async function submitForm(){
   document.getElementById('card').style.display='none';
-  document.getElementById('dots').style.display='none';
   document.getElementById('submitting').classList.add('on');
 
-  var q1task=cleanArr(ans.q1_task); if(ans.q1_task_other) q1task.push(ans.q1_task_other);
-  var q1cat=cleanArr(ans.q1_category); if(ans.q1_cat_other) q1cat.push(ans.q1_cat_other);
-  var q2reason=cleanArr(ans.q2_reason); if(ans.q2_reason_other) q2reason.push(ans.q2_reason_other);
-  var q2switch=cleanArr(ans.q2_switch); if(ans.q2_switch_other) q2switch.push(ans.q2_switch_other);
-  var q2dis=cleanArr(ans.q2_dissatisfied); if(ans.q2_dis_other) q2dis.push(ans.q2_dis_other);
-  var q3pay=cleanArr(ans.q3_why_pay); if(ans.q3_pay_other) q3pay.push(ans.q3_pay_other);
-  var q4why=cleanArr(ans.q4_why_want); if(ans.q4_why_other) q4why.push(ans.q4_why_other); if(ans.q4_liked_func) q4why.push('특정기능: '+ans.q4_liked_func);
-  var q7hes=cleanArr(ans.q7_hesitate); if(ans.q7_other) q7hes.push(ans.q7_other);
+  // 데이터 정리
+  const toolsText = Object.entries(ans.q4_tools||{})
+    .map(([k,v])=>`${k}(${v}점)`).join(', ');
+  if(ans.q4_other) toolsText ? toolsText+`, 기타:${ans.q4_other}` : `기타:${ans.q4_other}`;
 
-  var ts=new Date().toLocaleString('ko-KR');
-  var properties = {
-    '이름': {title:[{text:{content:'응답_'+ts}}]},
-    '성함': {rich_text:[{text:{content:ans.respondent_name||''}}]},
-    'AI 활용 빈도': toSelect(ans.q1_freq),
-    '주요 업무': toMulti(q1task),
-    'AI 카테고리': toMulti(q1cat),
-    '선택 이유': toMulti(q2reason),
-    '전환 계기': toMulti(q2switch),
-    '이전 AI 불만': toMulti(q2dis),
-    '유료 사용': toSelect(ans.q3_paid),
-    '유료 이유': toMulti(q3pay),
-    '써보고 싶은 AI': toText(ans.q4_want),
-    '써보고 싶은 이유': toMulti(q4why),
-    'AI로 해결하고 싶은 업무': toText(ans.q5_want_task),
-    '망설임 이유': toMulti(q7hes),
-    '제출 시각': toDate()
+  const properties = {
+    '이름': {title:[{text:{content:'응답_'+new Date().toLocaleString('ko-KR')}}]},
+    '성함': {rich_text:[{text:{content:ans.name||''}}]},
+    'Q1_진입장벽': toMulti(ans.q1),
+    'Q2_툴장벽': toMulti(ans.q2),
+    'Q3_활용여부': toSelect(ans.q3),
+    'Q3_1_활용영역': toMulti(ans.q3_1),
+    'Q3_2_빈도': toSelect(ans.q3_2),
+    'Q4_업무툴및별점': toText(toolsText),
+    'Q5_계속쓰는이유': toSelect(ans.q5),
+    'Q6_불만': toText(ans.q6),
+    'Q7_도입희망툴': toText(ans.q7),
+    'Q8_활용아이디어': toText(ans.q8),
+    '제출시각': {date:{start:new Date().toISOString()}}
   };
-
-  Object.keys(properties).forEach(function(k){
-    var v=properties[k];
-    if(!v) delete properties[k];
-    else if(v.multi_select&&!v.multi_select.length) delete properties[k];
-  });
+  Object.keys(properties).forEach(k=>{ if(!properties[k]) delete properties[k]; });
 
   try {
-    var res = await fetch('https://script.google.com/macros/s/AKfycbyARdUHDyoYKktWqtY5aHddad1Y2VYIaNLn16jv5UFcrT-aDmTvtwPD9c71AtU0FXpe/exec', {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: {'Content-Type': 'text/plain;charset=utf-8'},
-      body: JSON.stringify({properties:properties})
+    await fetch(GAS_URL,{
+      method:'POST', mode:'no-cors',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify({properties})
     });
-    document.getElementById('submitting').classList.remove('on');
-    document.getElementById('done').classList.add('on');
-  } catch(e){
-    console.error(e);
-    document.getElementById('submitting').classList.remove('on');
-    document.getElementById('done').classList.add('on');
-  }
+  } catch(e){ console.error(e); }
+
+  document.getElementById('submitting').classList.remove('on');
+  document.getElementById('done').classList.add('on');
+  // 8 그리기 애니메이션
+  setTimeout(function(){
+    var s = document.getElementById('done-8-stroke');
+    if(s){ s.style.transition='stroke-dashoffset 1.8s cubic-bezier(.4,0,.2,1)'; s.style.strokeDashoffset='0'; }
+  }, 100);
+  // 체크 뱃지
+  setTimeout(function(){
+    var c = document.getElementById('done-check');
+    if(c){ c.style.transition='opacity .1s,transform .4s cubic-bezier(.22,1,.36,1)'; c.style.opacity='1'; c.style.transform='scale(1)'; }
+    setTimeout(function(){
+      var p = document.getElementById('done-check-poly');
+      if(p){ p.style.transition='stroke-dashoffset .35s ease'; p.style.strokeDashoffset='0'; }
+    }, 100);
+  }, 2200);
+  // 텍스트
+  setTimeout(function(){
+    ['done-title','done-sub','done-fun'].forEach(function(id){
+      var el=document.getElementById(id);
+      if(el){ el.style.opacity='1'; el.style.transform='translateY(0)'; }
+    });
+  }, 2400);
+  // 컨페티
+  setTimeout(function(){
+    var container=document.getElementById('done-confetti');
+    if(!container) return;
+    var colors=['#8DC63F','#C4D880','#FFD400','#D6E8A0','#5A8A20'];
+    for(var i=0;i<28;i++){
+      var el=document.createElement('div');
+      el.style.cssText='position:absolute;border-radius:2px;left:'+(5+Math.random()*90)+'%;top:'+(5+Math.random()*25)+'%;width:'+(6+Math.random()*7)+'px;height:'+(6+Math.random()*7)+'px;background:'+colors[Math.floor(Math.random()*colors.length)]+';animation:confetti-fall '+(0.9+Math.random()*0.8)+'s ease '+(Math.random()*0.5)+'s both';
+      container.appendChild(el);
+    }
+  }, 2500);
 }
 
-slideTo(currentPanel());
-updateNav();
+function toSelect(v){ return v?{select:{name:v}}:undefined; }
+function toText(v){ return v?{rich_text:[{text:{content:String(v)}}]}:undefined; }
+function toMulti(arr){ return arr&&arr.length?{multi_select:arr.map(n=>({name:n}))}:undefined; }
+
+renderPanel();
 </script>
 </body>
 </html>
