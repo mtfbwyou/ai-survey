@@ -172,17 +172,9 @@ html,body{font-family:"Noto Sans KR",system-ui,sans-serif;background:var(--bg);m
     <div class="vis">
       <div class="vis-org">퍼블리싱라이브본부<br>퍼블리싱사업8실</div>
       <div class="vis-eight" id="vis-eight">
-        <svg style="animation:float 4s ease-in-out infinite" width="200" height="200" viewBox="0 0 150 150">
-          <text x="75" y="105" text-anchor="middle" font-family="'Barlow Condensed',system-ui,sans-serif" font-size="130" font-weight="800" font-style="normal" fill="none" stroke="#D6E8A0" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="320 800" dominant-baseline="middle">
-            <animate attributeName="stroke-dashoffset" from="0" to="-1120" dur="8s" repeatCount="indefinite"/>8
-          </text>
-          <text x="75" y="105" text-anchor="middle" font-family="'Barlow Condensed',system-ui,sans-serif" font-size="130" font-weight="800" font-style="normal" fill="none" stroke="#C8E09A" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="180 940" dominant-baseline="middle" opacity=".7">
-            <animate attributeName="stroke-dashoffset" from="-560" to="-1680" dur="8s" repeatCount="indefinite"/>8
-          </text>
-          <text x="75" y="105" text-anchor="middle" font-family="'Barlow Condensed',system-ui,sans-serif" font-size="130" font-weight="800" font-style="normal" fill="none" stroke="#E4F0C0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="100 1020" dominant-baseline="middle">
-            <animate attributeName="stroke-dashoffset" from="-280" to="-1400" dur="8s" repeatCount="indefinite"/>8
-          </text>
-        </svg>
+        <div style="animation:float 4s ease-in-out infinite;position:relative;width:200px;height:200px">
+          <canvas id="eight-canvas" width="200" height="200"></canvas>
+        </div>
         <div class="vis-tag" id="vis-tag">퍼블리싱사업8실</div>
         <div class="vis-desc" id="vis-desc">팀 AI 활용 현황 조사</div>
         <div class="vis-sub" id="vis-sub">솔직하게 답해주세요 :)</div>
@@ -549,6 +541,50 @@ function renderPanel(){
         if(p.type==='single'||p.type==='single_auto'){
           ans[p.id]=opt.v;
           renderPanel();
+
+// 8 흐르는 애니메이션 (canvas)
+(function(){
+  var canvas = document.getElementById('eight-canvas');
+  if(!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var offset = 0;
+  function draw(){
+    ctx.clearRect(0,0,200,200);
+    ctx.font = "800 160px 'Barlow Condensed',system-ui,sans-serif";
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    // 배경 8 (연한 전체 선)
+    ctx.strokeStyle = '#D6E8A0';
+    ctx.lineWidth = 7;
+    ctx.setLineDash([]);
+    ctx.lineDashOffset = 0;
+    ctx.strokeText('8', 100, 105);
+    // 선 1
+    ctx.strokeStyle = '#C8E09A';
+    ctx.lineWidth = 6;
+    ctx.setLineDash([320, 800]);
+    ctx.lineDashOffset = offset;
+    ctx.strokeText('8', 100, 105);
+    // 선 2
+    ctx.strokeStyle = '#A8CF6F';
+    ctx.lineWidth = 4;
+    ctx.globalAlpha = 0.7;
+    ctx.setLineDash([180, 940]);
+    ctx.lineDashOffset = offset * 1.5 + 560;
+    ctx.strokeText('8', 100, 105);
+    ctx.globalAlpha = 1;
+    // 선 3
+    ctx.strokeStyle = '#E4F0C0';
+    ctx.lineWidth = 3;
+    ctx.setLineDash([100, 1020]);
+    ctx.lineDashOffset = offset + 280;
+    ctx.strokeText('8', 100, 105);
+    offset -= 1.4;
+    requestAnimationFrame(draw);
+  }
+  // 폰트 로드 후 시작
+  document.fonts.ready.then(function(){ draw(); });
+})();
           if(p.type==='single_auto'){
             // Q3 NO → skip to Q7
             if(p.id==='q3' && opt.v==='아니요, 활용하지 않고 있어요'){
@@ -564,6 +600,44 @@ function renderPanel(){
             // 단독 선택
             ans[p.id]=[opt.v];
             renderPanel();
+
+// 8 흐르는 애니메이션 (canvas)
+(function(){
+  var canvas = document.getElementById('eight-canvas');
+  if(!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var offset = 0;
+  function draw(){
+    ctx.clearRect(0,0,200,200);
+    ctx.font = "800 160px 'Barlow Condensed',system-ui,sans-serif";
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    // 선 1
+    ctx.strokeStyle = '#C8E09A';
+    ctx.lineWidth = 6;
+    ctx.setLineDash([320, 800]);
+    ctx.lineDashOffset = offset;
+    ctx.strokeText('8', 100, 105);
+    // 선 2
+    ctx.strokeStyle = '#A8CF6F';
+    ctx.lineWidth = 4;
+    ctx.globalAlpha = 0.7;
+    ctx.setLineDash([180, 940]);
+    ctx.lineDashOffset = offset * 1.5 + 560;
+    ctx.strokeText('8', 100, 105);
+    ctx.globalAlpha = 1;
+    // 선 3
+    ctx.strokeStyle = '#E4F0C0';
+    ctx.lineWidth = 3;
+    ctx.setLineDash([100, 1020]);
+    ctx.lineDashOffset = offset + 280;
+    ctx.strokeText('8', 100, 105);
+    offset -= 1.4;
+    requestAnimationFrame(draw);
+  }
+  // 폰트 로드 후 시작
+  document.fonts.ready.then(function(){ draw(); });
+})();
             setTimeout(()=>goNext(),220);
             return;
           }
@@ -575,6 +649,44 @@ function renderPanel(){
           if(idx2>=0) ans[p.id].splice(idx2,1);
           else ans[p.id].push(opt.v);
           renderPanel();
+
+// 8 흐르는 애니메이션 (canvas)
+(function(){
+  var canvas = document.getElementById('eight-canvas');
+  if(!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var offset = 0;
+  function draw(){
+    ctx.clearRect(0,0,200,200);
+    ctx.font = "800 160px 'Barlow Condensed',system-ui,sans-serif";
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    // 선 1
+    ctx.strokeStyle = '#C8E09A';
+    ctx.lineWidth = 6;
+    ctx.setLineDash([320, 800]);
+    ctx.lineDashOffset = offset;
+    ctx.strokeText('8', 100, 105);
+    // 선 2
+    ctx.strokeStyle = '#A8CF6F';
+    ctx.lineWidth = 4;
+    ctx.globalAlpha = 0.7;
+    ctx.setLineDash([180, 940]);
+    ctx.lineDashOffset = offset * 1.5 + 560;
+    ctx.strokeText('8', 100, 105);
+    ctx.globalAlpha = 1;
+    // 선 3
+    ctx.strokeStyle = '#E4F0C0';
+    ctx.lineWidth = 3;
+    ctx.setLineDash([100, 1020]);
+    ctx.lineDashOffset = offset + 280;
+    ctx.strokeText('8', 100, 105);
+    offset -= 1.4;
+    requestAnimationFrame(draw);
+  }
+  // 폰트 로드 후 시작
+  document.fonts.ready.then(function(){ draw(); });
+})();
         }
       });
 
@@ -609,7 +721,45 @@ function renderPanel(){
 function skipToId(targetId){
   const flow=getFlow();
   const idx=flow.findIndex(p=>p.id===targetId);
-  if(idx>=0){ flowIdx=idx; renderPanel(); }
+  if(idx>=0){ flowIdx=idx; renderPanel();
+
+// 8 흐르는 애니메이션 (canvas)
+(function(){
+  var canvas = document.getElementById('eight-canvas');
+  if(!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var offset = 0;
+  function draw(){
+    ctx.clearRect(0,0,200,200);
+    ctx.font = "800 160px 'Barlow Condensed',system-ui,sans-serif";
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    // 선 1
+    ctx.strokeStyle = '#C8E09A';
+    ctx.lineWidth = 6;
+    ctx.setLineDash([320, 800]);
+    ctx.lineDashOffset = offset;
+    ctx.strokeText('8', 100, 105);
+    // 선 2
+    ctx.strokeStyle = '#A8CF6F';
+    ctx.lineWidth = 4;
+    ctx.globalAlpha = 0.7;
+    ctx.setLineDash([180, 940]);
+    ctx.lineDashOffset = offset * 1.5 + 560;
+    ctx.strokeText('8', 100, 105);
+    ctx.globalAlpha = 1;
+    // 선 3
+    ctx.strokeStyle = '#E4F0C0';
+    ctx.lineWidth = 3;
+    ctx.setLineDash([100, 1020]);
+    ctx.lineDashOffset = offset + 280;
+    ctx.strokeText('8', 100, 105);
+    offset -= 1.4;
+    requestAnimationFrame(draw);
+  }
+  // 폰트 로드 후 시작
+  document.fonts.ready.then(function(){ draw(); });
+})(); }
   else goNext();
 }
 
@@ -639,6 +789,44 @@ function goNext(){
   if(flowIdx>=flow.length-1){ submitForm(); return; }
   flowIdx++;
   renderPanel();
+
+// 8 흐르는 애니메이션 (canvas)
+(function(){
+  var canvas = document.getElementById('eight-canvas');
+  if(!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var offset = 0;
+  function draw(){
+    ctx.clearRect(0,0,200,200);
+    ctx.font = "800 160px 'Barlow Condensed',system-ui,sans-serif";
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    // 선 1
+    ctx.strokeStyle = '#C8E09A';
+    ctx.lineWidth = 6;
+    ctx.setLineDash([320, 800]);
+    ctx.lineDashOffset = offset;
+    ctx.strokeText('8', 100, 105);
+    // 선 2
+    ctx.strokeStyle = '#A8CF6F';
+    ctx.lineWidth = 4;
+    ctx.globalAlpha = 0.7;
+    ctx.setLineDash([180, 940]);
+    ctx.lineDashOffset = offset * 1.5 + 560;
+    ctx.strokeText('8', 100, 105);
+    ctx.globalAlpha = 1;
+    // 선 3
+    ctx.strokeStyle = '#E4F0C0';
+    ctx.lineWidth = 3;
+    ctx.setLineDash([100, 1020]);
+    ctx.lineDashOffset = offset + 280;
+    ctx.strokeText('8', 100, 105);
+    offset -= 1.4;
+    requestAnimationFrame(draw);
+  }
+  // 폰트 로드 후 시작
+  document.fonts.ready.then(function(){ draw(); });
+})();
   window.scrollTo(0,0);
 }
 
@@ -646,6 +834,44 @@ function goBack(){
   if(flowIdx<=0) return;
   flowIdx--;
   renderPanel();
+
+// 8 흐르는 애니메이션 (canvas)
+(function(){
+  var canvas = document.getElementById('eight-canvas');
+  if(!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var offset = 0;
+  function draw(){
+    ctx.clearRect(0,0,200,200);
+    ctx.font = "800 160px 'Barlow Condensed',system-ui,sans-serif";
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    // 선 1
+    ctx.strokeStyle = '#C8E09A';
+    ctx.lineWidth = 6;
+    ctx.setLineDash([320, 800]);
+    ctx.lineDashOffset = offset;
+    ctx.strokeText('8', 100, 105);
+    // 선 2
+    ctx.strokeStyle = '#A8CF6F';
+    ctx.lineWidth = 4;
+    ctx.globalAlpha = 0.7;
+    ctx.setLineDash([180, 940]);
+    ctx.lineDashOffset = offset * 1.5 + 560;
+    ctx.strokeText('8', 100, 105);
+    ctx.globalAlpha = 1;
+    // 선 3
+    ctx.strokeStyle = '#E4F0C0';
+    ctx.lineWidth = 3;
+    ctx.setLineDash([100, 1020]);
+    ctx.lineDashOffset = offset + 280;
+    ctx.strokeText('8', 100, 105);
+    offset -= 1.4;
+    requestAnimationFrame(draw);
+  }
+  // 폰트 로드 후 시작
+  document.fonts.ready.then(function(){ draw(); });
+})();
   window.scrollTo(0,0);
 }
 
@@ -727,6 +953,44 @@ function toText(v){ return v?{rich_text:[{text:{content:String(v)}}]}:undefined;
 function toMulti(arr){ return arr&&arr.length?{multi_select:arr.map(n=>({name:n}))}:undefined; }
 
 renderPanel();
+
+// 8 흐르는 애니메이션 (canvas)
+(function(){
+  var canvas = document.getElementById('eight-canvas');
+  if(!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var offset = 0;
+  function draw(){
+    ctx.clearRect(0,0,200,200);
+    ctx.font = "800 160px 'Barlow Condensed',system-ui,sans-serif";
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    // 선 1
+    ctx.strokeStyle = '#C8E09A';
+    ctx.lineWidth = 6;
+    ctx.setLineDash([320, 800]);
+    ctx.lineDashOffset = offset;
+    ctx.strokeText('8', 100, 105);
+    // 선 2
+    ctx.strokeStyle = '#A8CF6F';
+    ctx.lineWidth = 4;
+    ctx.globalAlpha = 0.7;
+    ctx.setLineDash([180, 940]);
+    ctx.lineDashOffset = offset * 1.5 + 560;
+    ctx.strokeText('8', 100, 105);
+    ctx.globalAlpha = 1;
+    // 선 3
+    ctx.strokeStyle = '#E4F0C0';
+    ctx.lineWidth = 3;
+    ctx.setLineDash([100, 1020]);
+    ctx.lineDashOffset = offset + 280;
+    ctx.strokeText('8', 100, 105);
+    offset -= 1.4;
+    requestAnimationFrame(draw);
+  }
+  // 폰트 로드 후 시작
+  document.fonts.ready.then(function(){ draw(); });
+})();
 </script>
 </body>
 </html>
