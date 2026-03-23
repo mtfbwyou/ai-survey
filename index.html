@@ -852,23 +852,23 @@ async function submitForm(){
   document.getElementById('submitting').classList.add('on');
 
   // 데이터 정리
-  const toolsText = Object.entries(ans.q4_tools||{})
-    .map(([k,v])=>`${k}(${v}점)`).join(', ');
-  if(ans.q4_other) toolsText ? toolsText+`, 기타:${ans.q4_other}` : `기타:${ans.q4_other}`;
+  const toolsArr=Object.entries(ans.q4_tools||{}).filter(([k,v])=>v&&v.sel).map(([k,v])=>{
+    if(k==='기타') return `기타: ${v.text||''}`;
+    const parts=[k];
+    if(v.stars) parts.push(`숙련도${v.stars}점`);
+    if(v.freq) parts.push(v.freq);
+    if(v.reasons&&v.reasons.length) parts.push(v.reasons.join('/'));
+    return parts.join(' | ');
+  });
+  const toolsText=toolsArr.join(', ');
 
   const properties = {
     '이름': {title:[{text:{content:'응답_'+new Date().toLocaleString('ko-KR')}}]},
     '성함': {rich_text:[{text:{content:ans.name||''}}]},
-    'Q1_진입장벽': toMulti(ans.q1),
-    'Q2_툴장벽': toMulti(ans.q2),
-    'Q3_활용여부': toSelect(ans.q3),
-    'Q3_1_활용영역': toMulti(ans.q3_1),
-    'Q3_2_빈도': toSelect(ans.q3_2),
-    'Q4_업무툴및별점': toText(toolsText),
-    'Q5_계속쓰는이유': toSelect(ans.q5),
-    'Q6_불만': toText(ans.q6),
-    'Q7_도입희망툴': toText(ans.q7),
-    'Q8_활용아이디어': toText(ans.q8),
+    'Q1_활용아이디어': toText(ans.q1),
+    'Q2_도입희망툴': toText(ans.q2),
+    'Q3_진입장벽': toMulti(ans.q3),
+    'Q4_업무툴': toText(toolsText),
     '제출시각': {date:{start:new Date().toISOString()}}
   };
   Object.keys(properties).forEach(k=>{ if(!properties[k]) delete properties[k]; });
