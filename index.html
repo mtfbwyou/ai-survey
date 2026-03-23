@@ -37,7 +37,7 @@ html,body{font-family:"Noto Sans KR",system-ui,sans-serif;background:var(--bg);m
 
 /* 레이아웃 */
 .shell{width:100%;display:flex;flex-direction:column;gap:20px;align-items:center;padding:32px 20px}
-.card{width:960px;background:#F4F5F0;border-radius:var(--r);overflow:hidden;border:1px solid var(--bd);display:grid;grid-template-columns:360px 600px;min-height:860px}
+.card{width:960px;background:#F4F5F0;border-radius:var(--r);overflow:hidden;border:1px solid var(--bd);display:grid;grid-template-columns:360px 600px;height:860px}
 
 /* 왼쪽 비주얼 */
 .vis{background:#EAEDDF;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:28px;border-right:1px solid var(--inner-bd);position:relative;overflow:hidden}
@@ -57,7 +57,7 @@ html,body{font-family:"Noto Sans KR",system-ui,sans-serif;background:var(--bg);m
 .sg-desc{font-size:11px;color:var(--t2);line-height:1.4}
 
 /* 오른쪽 설문 */
-.form{background:#fff;padding:32px 28px;display:flex;flex-direction:column}
+.form{background:#fff;padding:32px 28px;display:flex;flex-direction:column;overflow:hidden;height:100%}
 .f-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}
 .f-dots{display:flex;gap:5px;align-items:center}
 .f-dot{width:6px;height:6px;border-radius:50%;background:var(--bd);transition:all .3s}
@@ -165,7 +165,8 @@ html,body{font-family:"Noto Sans KR",system-ui,sans-serif;background:var(--bg);m
 </style>
 </head>
 <body>
-<div class="shell">
+<canvas id="bg-wm" style="position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0.06;width:100%;height:100%"></canvas>
+<div class="shell" style="position:relative;z-index:1">
   <div class="card" id="card">
 
     <!-- 왼쪽 비주얼 -->
@@ -197,7 +198,7 @@ html,body{font-family:"Noto Sans KR",system-ui,sans-serif;background:var(--bg);m
         <div class="f-dots" id="dots"></div>
         <div class="f-step-num" id="step-num"></div>
       </div>
-      <div id="panel-area" style="flex:1;display:flex;flex-direction:column"></div>
+      <div id="panel-area" style="flex:1;display:flex;flex-direction:column;min-height:0"></div>
       <div class="f-nav">
         <button class="btn-back" id="btn-back">이전</button>
         <span class="f-step-txt" id="step-txt"></span>
@@ -243,12 +244,20 @@ const TOOLS = ['ChatGPT','Claude','Gemini','Copilot','Grok','Perplexity','Notebo
 
 // 패널 정의
 const PANELS = [
-  // 0: 성함
   {id:'name', step:'시작하기 전에', title:'성함을\n입력해 주세요', sub:'응답 데이터에 함께 저장돼요', type:'name',
    vis:{desc:'팀 AI 활용 현황 조사', sub:'시작하기 전에 성함을 알려주세요 :)'}},
 
-  // Q1: 진입장벽
-  {id:'q1', step:'Q1', title:'AI를 활용하려 할 때\n망설이는 이유가 있나요?', sub:'해당하는 항목을 모두 골라주세요', type:'multi',
+  {id:'q1', step:'Q1', title:'AI를 활용하고 싶은 업무나\n아이디어가 있나요?', sub:'구체적으로 적어주세요', type:'textarea',
+   placeholder:'예: 매주 반복되는 주간보고 초안을 AI가 잡아준다면 좋겠어요',
+   hint:['매주 반복되는 주간보고 초안을 AI가 잡아준다면, 내용 검토에만 집중할 수 있을 것 같아요','경쟁사 동향을 자동으로 모아서 요약해주는 봇이 있으면 리서치 시간을 줄일 수 있을 것 같아요','글로벌 팀과 소통할 때 번역에 시간이 많이 들어요. 맥락에 맞는 번역 툴이 있으면 좋겠어요','발표 자료 초안을 AI가 잡아주면 디자인보다 내용 구성에 집중할 수 있을 것 같아요'],
+   vis:{desc:'AI 활용 아이디어', sub:'어떤 업무에 활용하고 싶으신가요?'}},
+
+  {id:'q2', step:'Q2', title:'회사 차원에서 지원해준다면\n도입을 희망하는 툴이 있나요?', sub:'이유와 함께 적어주세요', type:'textarea',
+   placeholder:'예: Perplexity — 리서치할 때 출처가 명확해서 업무 신뢰도가 높아질 것 같아요',
+   hint:['Perplexity — 리서치할 때 출처가 명확해서 업무 신뢰도가 높아질 것 같아요','Midjourney — 발표 자료 이미지 직접 만들면 외주 비용을 줄일 수 있을 것 같아요','Fireflies — 회의 자동 녹취·요약이 되면 회의록 작성 시간을 줄일 수 있을 것 같아요','Notion AI — 회의록을 자동으로 정리하고 액션 아이템까지 뽑아줘서 팔로업이 쉬워질 것 같아요'],
+   vis:{desc:'도입 희망 AI 툴', sub:'어떤 툴이 필요한지 알려주세요'}},
+
+  {id:'q3', step:'Q3', title:'AI를 활용하려 할 때\n망설이는 이유가 있나요?', sub:'우선순위 3개까지 선택해 주세요', type:'multi', maxSelect:3,
    vis:{desc:'AI 활용의 진입장벽', sub:'솔직하게 답해주세요 :)'},
    opts:[
      {v:'뭐부터 시작해야 할지 모르겠음 (온보딩 막막함)', ic:'<svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.5"/><path d="M10 13v-1c0-1 2.5-1.5 2.5-3.5a2.5 2.5 0 0 0-5 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="10" cy="14.5" r=".8" fill="currentColor"/></svg>'},
@@ -260,85 +269,8 @@ const PANELS = [
      {v:'기타', ic:'<svg viewBox="0 0 20 20" fill="none"><path d="M4 16l2-4L14 4l2 2-8 8-4 2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>', other:true},
    ]},
 
-  // Q2: 특정 툴 장벽
-  {id:'q2', step:'Q2', title:'특정 AI 툴을 써보려 했을 때\n부딪힌 장벽이 있었나요?', sub:'해당하는 항목을 모두 골라주세요', type:'multi_exclusive',
-   vis:{desc:'AI 툴 사용 시 장벽', sub:'경험한 것들을 골라주세요'},
-   exclusive:'AI 활용을 시도해 본 적이 없음',
-   opts:[
-     {v:'AI 활용을 시도해 본 적이 없음', ic:'<svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.5"/><path d="M5 15L15 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>'},
-     {v:'무료 플랜이 너무 제한적이거나 유료 구독료가 부담임', ic:'<svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.5"/><path d="M10 6v8M7.5 8.5h4a1.5 1.5 0 0 1 0 3h-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>'},
-     {v:'가볍게 진입하기에 프로그램의 학습 난이도가 너무 높았음', ic:'<svg viewBox="0 0 20 20" fill="none"><path d="M3 5h14M3 9h14M3 13h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="15" cy="14" r="3.5" stroke="currentColor" stroke-width="1.4"/><path d="M17.5 16.5l2 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>'},
-     {v:'트렌드가 빨리 바뀌어서 이걸 쓰는 게 맞을지 확신이 안 섬', ic:'<svg viewBox="0 0 20 20" fill="none"><path d="M10 4a6 6 0 1 1-4.24 1.76" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M4 3v4h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'},
-     {v:'업무에 쓰고 싶지만 회사 보안 정책상 사용이 제한됨', ic:'<svg viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M3 8h14M8 8v9" stroke="currentColor" stroke-width="1.5"/></svg>'},
-     {v:'한국어 지원이 부족하거나 불편함', ic:'<svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.5"/><path d="M3 10h14M10 3c-2 2.5-2 9.5 0 14M10 3c2 2.5 2 9.5 0 14" stroke="currentColor" stroke-width="1.4"/></svg>'},
-     {v:'기존 도구로 충분해서 굳이 새로 배울 필요가 없음', ic:'<svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.5"/><path d="M7 10l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'},
-     {v:'써봤지만 기대 이하였음', ic:'<svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.5"/><path d="M7 13c.8-1.5 5.2-1.5 6 0" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="7.5" cy="8.5" r="1" fill="currentColor"/><circle cx="12.5" cy="8.5" r="1" fill="currentColor"/></svg>', other:true, otherPlaceholder:'어떤 점이 아쉬웠나요?'},
-     {v:'기타', ic:'<svg viewBox="0 0 20 20" fill="none"><path d="M4 16l2-4L14 4l2 2-8 8-4 2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>', other:true},
-   ]},
-
-  // Q3: 현재 활용 여부 YES/NO
-  {id:'q3', step:'Q3', title:'현재 AI 도구를\n활용하고 계신가요?', sub:'', type:'single_auto',
-   vis:{desc:'현재 AI 활용 여부', sub:''},
-   opts:[
-     {v:'네, 활용 중이에요', ic:'<svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.5"/><path d="M7 10l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'},
-     {v:'아니요, 활용하지 않고 있어요', ic:'<svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.5"/><path d="M7 7l6 6M13 7l-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>'},
-   ]},
-
-  // Q3-1: 어디서 활용
-  {id:'q3_1', step:'Q3-1', title:'어디에 사용 중이신가요?', sub:'해당하는 항목을 모두 골라주세요', type:'multi',
-   condKey:'q3', condVal:'네, 활용 중이에요',
-   vis:{desc:'AI 활용 영역', sub:''},
-   opts:[
-     {v:'업무 활용', ic:'<svg viewBox="0 0 20 20" fill="none"><rect x="3" y="7" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M7 7V5a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>'},
-     {v:'개인 활용', ic:'<svg viewBox="0 0 20 20" fill="none"><path d="M3 10L10 3l7 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 10v7h10v-7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'},
-   ]},
-
-  // Q3-2: 빈도
-  {id:'q3_2', step:'Q3-2', title:'활용 빈도는 어떤가요?', sub:'', type:'single_auto',
-   condKey:'q3', condVal:'네, 활용 중이에요',
-   vis:{desc:'AI 활용 빈도', sub:'하나를 고르면 자동으로 넘어가요'},
-   opts:[
-     {v:'거의 매일', ic:'<svg viewBox="0 0 20 20" fill="none"><path d="M10 3c0 4-4 5-4 9a4 4 0 0 0 8 0c0-4-4-5-4-9z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M8.5 14.5c.5 1 2.5 1 3 0" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>', sub:'업무 흐름에 AI가 있어요'},
-     {v:'주 1~3회', ic:'<svg viewBox="0 0 20 20" fill="none"><rect x="3" y="4" width="14" height="13" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M3 9h14M7 3v2M13 3v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>', sub:'정기적으로 활용해요'},
-     {v:'월 1~3회', ic:'<svg viewBox="0 0 20 20" fill="none"><rect x="3" y="4" width="14" height="13" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M3 9h14M7 3v2M13 3v2M7 13h2M11 13h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>', sub:'필요할 때 가끔 써요'},
-     {v:'거의 안 씀', ic:'<svg viewBox="0 0 20 20" fill="none"><path d="M5 10h10M8 7h6M11 13h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>', sub:'아직 익숙하지 않아요'},
-   ]},
-
-  // Q4: 툴 선택 + 별점
-  {id:'q4', step:'Q4', title:'업무에 활용 중이신 AI 툴을 골라주세요.\n어느 정도로 활용 중인가요?', sub:'해당 툴을 모두 선택하고 자신의 활용 수준에 대한 점수를 매겨주세요', type:'tools',
-   condKey:'q3_1', condIncludes:'업무 활용',
-   vis:{desc:'업무 활용 AI 툴', sub:'선택 후 별점을 매겨주세요'}},
-
-  // Q5: 계속 쓰는 이유
-  {id:'q5', step:'Q5', title:'사용 중인 AI를 계속 쓰실\n계획이라면, 이유가 있나요?', sub:'가장 가까운 하나를 골라주세요', type:'single',
-   condKey:'q3', condVal:'네, 활용 중이에요',
-   vis:{desc:'계속 사용하는 이유', sub:''},
-   opts:[
-     {v:'회사에서 제공해주는 서비스라 따로 고민 없이 계속 쓸 것 같음', ic:'<svg viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M3 8h14M8 8v9" stroke="currentColor" stroke-width="1.5"/></svg>'},
-     {v:'써보니 좋기도 하고, 익숙해져서 관성적으로 계속 쓰게 됨', ic:'<svg viewBox="0 0 20 20" fill="none"><path d="M4 10a6 6 0 0 1 10-4.47M16 10a6 6 0 0 1-10 4.47" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M14 4l2 1.5-1.5 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>'},
-     {v:'주변 동료들도 같은 툴을 써서 공유·소통하기 편함', ic:'<svg viewBox="0 0 20 20" fill="none"><circle cx="7" cy="7" r="3" stroke="currentColor" stroke-width="1.5"/><circle cx="13" cy="7" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M1 17c0-3 2.7-5 6-5M19 17c0-3-2.7-5-6-5M10 12c2.5 0 5 1.5 5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>'},
-     {v:'새로운 걸 시도하고 싶은데 어떤 게 나은지 정보가 없음', ic:'<svg viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="5.5" stroke="currentColor" stroke-width="1.5"/><path d="M13.5 13.5L17 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>'},
-     {v:'최신 AI 트렌드를 찾아보고 능동적으로 바꿔가는 중', ic:'<svg viewBox="0 0 20 20" fill="none"><path d="M10 3c2 0 5 2 5 7l-2 1-1 4H8l-1-4-2-1c0-5 3-7 5-7z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 15v2h4v-2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>'},
-     {v:'기타', ic:'<svg viewBox="0 0 20 20" fill="none"><path d="M4 16l2-4L14 4l2 2-8 8-4 2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>', other:true},
-   ]},
-
-  // Q6: 불만 서술
-  {id:'q6', step:'Q6', title:'사용 중인 AI에\n불만은 없나요?', sub:'어떤 AI인지, 어떤 점이 불만인지 자유롭게 적어주세요', type:'textarea',
-   condKey:'q3', condVal:'네, 활용 중이에요',
-   placeholder:'예: ChatGPT — 무료 플랜 사용량이 너무 적어요\n없음',
-   vis:{desc:'AI 불만 사항', sub:'없으면 "없음"이라고 써주세요'}},
-
-  // Q7: 도입 희망 툴
-  {id:'q7', step:'Q7', title:'회사 돈으로 업무에 활용해\n보고 싶은 툴이 있나요?', sub:'도입을 추천하는 AI 툴이 있다면 함께 써주세요', type:'textarea',
-   placeholder:'예: Perplexity — 리서치할 때 출처가 명확해서 업무 신뢰도가 높아질 것 같아요\n없음',
-   hint:['Perplexity — 리서치할 때 출처가 명확해서 업무 신뢰도가 높아질 것 같아요','Midjourney — 발표 자료 이미지 직접 만들면 외주 비용을 줄일 수 있을 것 같아요','Fireflies — 회의 자동 녹취·요약이 되면 회의록 작성 시간을 줄일 수 있을 것 같아요','없음 — 현재 제공되는 툴로 충분해요'],
-   vis:{desc:'도입 희망 AI 툴', sub:'어떤 툴이 필요한지 알려주세요'}},
-
-  // Q8: 활용 아이디어
-  {id:'q8', step:'Q8', title:'AI를 활용하고 싶은 업무나\n아이디어가 있나요?', sub:'구체적으로 적어주세요', type:'textarea',
-   placeholder:'예: 매주 반복되는 주간보고 초안을 AI가 잡아준다면 좋겠어요\n예: 발표 자료 초안을 AI가 잡아주면 디자인보다 내용 구성에 집중할 수 있을 것 같아요',
-   hint:['매주 반복되는 주간보고 초안을 AI가 잡아준다면, 내용 검토에만 집중할 수 있을 것 같아요','경쟁사 동향을 자동으로 모아서 요약해주는 봇이 있으면 리서치 시간을 줄일 수 있을 것 같아요','글로벌 팀과 소통할 때 번역에 시간이 많이 들어요. 맥락에 맞는 번역 툴이 있으면 좋겠어요','발표 자료 초안을 AI가 잡아주면, 디자인보다 내용 구성에 더 집중할 수 있을 것 같아요'],
-   vis:{desc:'AI 활용 아이디어', sub:'어떤 업무에 활용하고 싶으신가요?'}},
+  {id:'q4', step:'Q4', title:'업무에 활용 중이신 AI 툴을\n골라주세요.', sub:'선택 후 활용 정도를 알려주세요', type:'tools',
+   vis:{desc:'업무 활용 AI 툴', sub:'선택 후 세부 정보를 알려주세요'}},
 ];
 
 let flowIdx = 0;
@@ -399,6 +331,7 @@ function renderPanel(){
   updateVis(p);
 
   const area = document.getElementById('panel-area');
+  area.style.overflowY=''; area.style.paddingRight='';
   area.innerHTML = '';
 
   // 스텝 레이블
@@ -446,74 +379,85 @@ function renderPanel(){
     document.getElementById('ta-inp').addEventListener('input',function(){ ans[p.id]=this.value; });
   }
   else if(p.type==='tools'){
-    const grid = document.createElement('div');
-    grid.className='tool-grid';
-    const toolAns = ans.q4_tools || {};
-    TOOLS.forEach(tool=>{
-      const isSel = !!toolAns[tool];
-      const stars = toolAns[tool]||0;
-      const item = document.createElement('div');
-      item.className='tool-item';
-      const starsHtml = [1,2,3,4,5].map(i=>`<span class="star ${i<=stars?'on':''}" data-tool="${tool}" data-star="${i}">★</span>`).join('');
+    const FREQ_OPTS=['거의 매일','주 1~3회','월 1~3회','가끔'];
+    const REASON_OPTS=['회사 제공 서비스','업무 효율이 좋아서','주변 추천','무료라서','다른 툴 정보 없음'];
+    if(!ans.q4_tools) ans.q4_tools={};
+    const list=document.createElement('div');
+    list.style.cssText='display:flex;flex-direction:column;gap:8px;flex:1';
+    const allTools=[...TOOLS,'기타'];
+    allTools.forEach(tool=>{
+      const tid=tool.replace(/[^a-zA-Z0-9]/g,'_');
+      const d=ans.q4_tools[tool]||{};
+      const isSel=!!d.sel;
+      const item=document.createElement('div');
+      item.style.cssText=`border:1.5px solid ${isSel?'var(--accent)':'#E8EAE0'};border-radius:12px;overflow:hidden;background:${isSel?'#fff':'#FAFAF7'};transition:border-color .15s`;
+      const starsHtml=[1,2,3,4,5].map(i=>`<span data-star="${i}" style="font-size:18px;cursor:pointer;color:${(d.stars||0)>=i?'#FFD400':'#DDD'};transition:color .1s;user-select:none">★</span>`).join('');
+      const freqHtml=FREQ_OPTS.map(f=>`<div data-freq="${f}" style="font-size:11px;padding:5px 12px;border:1.5px solid ${d.freq===f?'var(--accent)':'#E8EAE0'};border-radius:20px;cursor:pointer;color:${d.freq===f?'var(--dark)':'#888'};background:${d.freq===f?'var(--soft)':'#fff'};font-weight:${d.freq===f?'600':'400'};transition:all .15s">${f}</div>`).join('');
+      const reasonHtml=REASON_OPTS.map(r=>`<div data-reason="${r}" style="font-size:11px;padding:5px 12px;border:1.5px solid ${(d.reasons||[]).includes(r)?'var(--accent)':'#E8EAE0'};border-radius:20px;cursor:pointer;color:${(d.reasons||[]).includes(r)?'var(--dark)':'#888'};background:${(d.reasons||[]).includes(r)?'var(--soft)':'#fff'};font-weight:${(d.reasons||[]).includes(r)?'600':'400'};transition:all .15s">${r}</div>`).join('');
+      const chkHtml=isSel?'<svg viewBox="0 0 10 10" width="10" height="10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>':'';
+      const innerDetail=tool==='기타'
+        ?`<div style="margin-top:4px"><input placeholder="직접 입력해 주세요" value="${d.text||''}" data-other="1" style="width:100%;padding:9px 12px;border:1.5px solid var(--bd);border-radius:var(--rs);font-size:13px;font-family:inherit;color:var(--t1);background:#fff;outline:none"></div>`
+        :`<div><div style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.06em;margin-bottom:6px">활용 숙련도</div><div class="stars-${tid}" style="display:flex;gap:4px">${starsHtml}</div></div>
+          <div><div style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.06em;margin-bottom:6px">사용 빈도</div><div class="freq-${tid}" style="display:flex;gap:6px;flex-wrap:wrap">${freqHtml}</div></div>
+          <div><div style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.06em;margin-bottom:6px">사용하는 이유 (복수 선택)</div><div class="reason-${tid}" style="display:flex;gap:6px;flex-wrap:wrap">${reasonHtml}</div></div>`;
       item.innerHTML=`
-        <div class="tool-opt ${isSel?'sel':''}" data-tool="${tool}">
-          <strong>${tool}</strong>
-          <div class="tool-cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="th-${tid}" style="display:flex;align-items:center;gap:10px;padding:11px 13px;cursor:pointer;user-select:none">
+          <div class="chk-${tid}" style="width:18px;height:18px;border-radius:4px;border:1.5px solid ${isSel?'var(--accent)':'#DDD'};background:${isSel?'var(--accent)':'transparent'};display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s">${chkHtml}</div>
+          <div style="font-size:13px;font-weight:${isSel?'700':'500'};color:${isSel?'var(--dark)':'#444'};flex:1">${tool}</div>
+          <div class="arr-${tid}" style="font-size:11px;color:${isSel?'var(--accent)':'#CCC'};transition:transform .2s;transform:${isSel?'rotate(180deg)':'rotate(0deg)'}">▾</div>
         </div>
-        <div class="tool-stars ${isSel?'show':''}" id="stars-${tool.replace(/[^a-zA-Z0-9]/g,'_')}">
-          <span style="font-size:11px;color:var(--t2);margin-right:4px">활용도</span>
-          ${starsHtml}
-        </div>`;
-      grid.appendChild(item);
-    });
-    // 기타
-    const otherSel = !!(ans.q4_other);
-    const otherItem = document.createElement('div');
-    otherItem.className='tool-item';
-    otherItem.innerHTML=`
-      <div class="tool-opt ${otherSel?'sel':''}" data-tool="__other__">
-        <strong>기타</strong>
-        <div class="tool-cbox"><svg viewBox="0 0 10 10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      </div>
-      <div class="other-input ${otherSel?'show':''}"><input placeholder="직접 입력" value="${ans.q4_other||''}"></div>`;
-    grid.appendChild(otherItem);
-    area.appendChild(grid);
-
-    // 툴 클릭
-    grid.querySelectorAll('.tool-opt').forEach(btn=>{
-      btn.addEventListener('click',()=>{
-        const tool = btn.dataset.tool;
-        if(tool==='__other__'){
-          btn.classList.toggle('sel');
-          const oi = btn.nextElementSibling;
-          if(oi) oi.classList.toggle('show', btn.classList.contains('sel'));
-          if(!btn.classList.contains('sel')) ans.q4_other='';
-        } else {
-          if(!ans.q4_tools) ans.q4_tools={};
-          btn.classList.toggle('sel');
-          const starsDiv = document.getElementById('stars-'+tool.replace(/[^a-zA-Z0-9]/g,'_'));
-          const on = btn.classList.contains('sel');
-          if(starsDiv) starsDiv.classList.toggle('show', on);
-          if(!on) delete ans.q4_tools[tool];
-          else ans.q4_tools[tool] = ans.q4_tools[tool]||0;
-        }
+        <div class="dt-${tid}" style="display:${isSel?'flex':'none'};flex-direction:column;gap:12px;padding:0 13px 14px;border-top:1px solid #F0F7E0">${innerDetail}</div>`;
+      item.querySelector('.th-'+tid).addEventListener('click',()=>{
+        if(!ans.q4_tools[tool]) ans.q4_tools[tool]={};
+        ans.q4_tools[tool].sel=!ans.q4_tools[tool].sel;
+        const on=ans.q4_tools[tool].sel;
+        item.style.borderColor=on?'var(--accent)':'#E8EAE0';
+        item.style.background=on?'#fff':'#FAFAF7';
+        const dt=item.querySelector('.dt-'+tid); if(dt) dt.style.display=on?'flex':'none';
+        const arr=item.querySelector('.arr-'+tid); if(arr){arr.style.transform=on?'rotate(180deg)':'rotate(0deg)';arr.style.color=on?'var(--accent)':'#CCC';}
+        const chk=item.querySelector('.chk-'+tid); if(chk){chk.style.borderColor=on?'var(--accent)':'#DDD';chk.style.background=on?'var(--accent)':'transparent';chk.innerHTML=on?'<svg viewBox="0 0 10 10" width="10" height="10"><polyline points="1.5,5 3.8,7.5 8.5,2.5" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>':'';}
+        const nm=item.querySelector('.th-'+tid+' div:nth-child(2)'); if(nm){nm.style.fontWeight=on?'700':'500';nm.style.color=on?'var(--dark)':'#444';}
       });
+      if(tool!=='기타'){
+        item.querySelectorAll('.stars-'+tid+' span').forEach(star=>{
+          star.addEventListener('click',(e)=>{
+            e.stopPropagation();
+            const n=parseInt(star.dataset.star);
+            if(!ans.q4_tools[tool]) ans.q4_tools[tool]={sel:true};
+            ans.q4_tools[tool].stars=n;
+            item.querySelectorAll('.stars-'+tid+' span').forEach((s,i)=>{s.style.color=i<n?'#FFD400':'#DDD';});
+          });
+        });
+        item.querySelectorAll('.freq-'+tid+' div').forEach(btn=>{
+          btn.addEventListener('click',(e)=>{
+            e.stopPropagation();
+            if(!ans.q4_tools[tool]) ans.q4_tools[tool]={sel:true};
+            ans.q4_tools[tool].freq=btn.dataset.freq;
+            item.querySelectorAll('.freq-'+tid+' div').forEach(b=>{const on=b.dataset.freq===btn.dataset.freq;b.style.borderColor=on?'var(--accent)':'#E8EAE0';b.style.background=on?'var(--soft)':'#fff';b.style.color=on?'var(--dark)':'#888';b.style.fontWeight=on?'600':'400';});
+          });
+        });
+        item.querySelectorAll('.reason-'+tid+' div').forEach(btn=>{
+          btn.addEventListener('click',(e)=>{
+            e.stopPropagation();
+            if(!ans.q4_tools[tool]) ans.q4_tools[tool]={sel:true};
+            if(!ans.q4_tools[tool].reasons) ans.q4_tools[tool].reasons=[];
+            const r=btn.dataset.reason, idx=ans.q4_tools[tool].reasons.indexOf(r);
+            if(idx>=0) ans.q4_tools[tool].reasons.splice(idx,1); else ans.q4_tools[tool].reasons.push(r);
+            const on=ans.q4_tools[tool].reasons.includes(r);
+            btn.style.borderColor=on?'var(--accent)':'#E8EAE0';btn.style.background=on?'var(--soft)':'#fff';btn.style.color=on?'var(--dark)':'#888';btn.style.fontWeight=on?'600':'400';
+          });
+        });
+      } else {
+        const inp=item.querySelector('[data-other]');
+        if(inp) inp.addEventListener('input',function(){if(!ans.q4_tools['기타']) ans.q4_tools['기타']={sel:true};ans.q4_tools['기타'].text=this.value;});
+      }
+      list.appendChild(item);
     });
-
-    // 별점 클릭
-    grid.querySelectorAll('.tool-stars .star').forEach(star=>{
-      star.addEventListener('click',()=>{
-        const tool=star.dataset.tool, n=parseInt(star.dataset.star);
-        if(!ans.q4_tools) ans.q4_tools={};
-        ans.q4_tools[tool]=n;
-        const starsDiv=document.getElementById('stars-'+tool.replace(/[^a-zA-Z0-9]/g,'_'));
-        if(starsDiv) starsDiv.querySelectorAll('.star').forEach(s=> s.classList.toggle('on', parseInt(s.dataset.star)<=n));
-      });
-    });
-
-    // 기타 입력
-    const otherInp = otherItem.querySelector('input');
-    if(otherInp) otherInp.addEventListener('input',function(){ ans.q4_other=this.value; });
+    area.appendChild(list);
+    // Q4 스크롤 - form 안쪽에서만
+    area.style.overflowY='auto';
+    area.style.paddingRight='6px';
+    area.style.height='100%';
   }
   else {
     // single / single_auto / multi / multi_exclusive
@@ -525,9 +469,10 @@ function renderPanel(){
       const isSel = (p.type==='single'||p.type==='single_auto')
         ? ans[p.id]===opt.v
         : Array.isArray(ans[p.id]) && ans[p.id].includes(opt.v);
+      const isMaxed = p.maxSelect && Array.isArray(ans[p.id]) && ans[p.id].length>=p.maxSelect && !isSel;
 
       const div = document.createElement('div');
-      div.className=`opt ${isSel?'sel':''}`;
+      div.className=`opt ${isSel?'sel':''} ${isMaxed?'disabled':''}`;
 
       const boxHtml = (p.type==='single'||p.type==='single_auto')
         ? `<div class="radio"></div>`
@@ -541,6 +486,26 @@ function renderPanel(){
         if(p.type==='single'||p.type==='single_auto'){
           ans[p.id]=opt.v;
           renderPanel();
+
+(function(){
+  var canvas=document.getElementById('bg-wm');
+  if(!canvas) return;
+  function draw(){
+    canvas.width=window.innerWidth; canvas.height=window.innerHeight;
+    var ctx=canvas.getContext('2d');
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.save();
+    ctx.font="600 12px 'Noto Sans KR',system-ui,sans-serif";
+    ctx.fillStyle='#5A8A20';
+    ctx.rotate(-Math.PI/6);
+    var text='퍼블리싱사업8실', tw=ctx.measureText(text).width, gapX=tw+36, gapY=40;
+    for(var y=-canvas.height;y<canvas.height*2;y+=gapY)
+      for(var x=-canvas.width;x<canvas.width*2;x+=gapX)
+        ctx.fillText(text,x,y);
+    ctx.restore();
+  }
+  draw(); window.addEventListener('resize',draw);
+})();
 
 // 8 흐르는 애니메이션 (canvas)
 (function(){
@@ -646,8 +611,12 @@ function renderPanel(){
             ans[p.id]=ans[p.id].filter(v=>v!==p.exclusive);
           }
           const idx2=ans[p.id].indexOf(opt.v);
-          if(idx2>=0) ans[p.id].splice(idx2,1);
-          else ans[p.id].push(opt.v);
+          if(idx2>=0){
+            ans[p.id].splice(idx2,1);
+          } else {
+            if(p.maxSelect && ans[p.id].length>=p.maxSelect) return;
+            ans[p.id].push(opt.v);
+          }
           renderPanel();
 
 // 8 흐르는 애니메이션 (canvas)
